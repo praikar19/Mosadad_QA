@@ -674,8 +674,8 @@ public class OpenRecoveryClaimsPage extends BasePage {
      * Confirmed live 2026-09-04: this executes a real settlement payment
      * against the entity's wallet via the ATB gateway — not a simulated or
      * sandboxed no-op. Only call this with explicit authorization for the
-     * financial-transaction side effect (see WalletE2ETest's Javadoc for
-     * the authorization this was built under). On success, redirects to
+     * financial-transaction side effect it causes; no enabled test in this
+     * suite calls it today. On success, redirects to
      * /entity-portal/payment-success?transactionId=... in the same tab.
      */
     public void clickCheckoutConfirm(){

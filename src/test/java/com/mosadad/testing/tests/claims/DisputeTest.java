@@ -6,7 +6,9 @@ import org.testng.annotations.Test;
 
 /**
  * STUB SUITE — Disputes (MOSADAD_DOMAIN.md §Disputes). All methods
- * disabled — see ClaimRegistrationTest header comment for why.
+ * disabled — the real Dispute screen hasn't been walked live yet, so
+ * there are no verified selectors to test against. See FRAMEWORK.md's
+ * verified-vs-stubbed ledger.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Disputes")

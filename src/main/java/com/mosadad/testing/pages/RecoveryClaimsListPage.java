@@ -7,9 +7,10 @@ import com.microsoft.playwright.Page;
  * /entity-portal/my-claims — Recovery Claim Records module, reached via
  * RecoveryClaimsHubPage.openRecoveryClaimsList(). URL verified live
  * 2026-08-30 (RecoveryClaimsNavigationTest); page content itself not yet
- * explored — only isLoaded() is backed by anything real so far. Likely
- * entry point for the real "Create Claim" flow (Stage 1) once explored —
- * see ClaimRegistrationPage.
+ * explored — only isLoaded() is backed by anything real so far. The real
+ * "Create Claim" flow (Stage 1, Manual Entry) is reached from here via
+ * PotentialRecoveryClaimsListPage — see CreateManualRecoveryClaimPage /
+ * CreateManualClaimPage.
  */
 public class RecoveryClaimsListPage extends BasePage {
 

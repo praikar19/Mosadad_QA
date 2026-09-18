@@ -7,8 +7,10 @@ import org.testng.annotations.Test;
 
 /**
  * STUB SUITE — Stage 2: Quotation, Normal Repair / Total Loss / Salvage
- * (MOSADAD_DOMAIN.md §Stage 2). All methods disabled — see ClaimRegistrationTest
- * header comment for why, and pages/claims/QuotationPage for the TODO locators.
+ * (MOSADAD_DOMAIN.md §Stage 2). All methods disabled — the real Quotation
+ * screen hasn't been walked live yet, so there are no verified selectors
+ * to test against; see pages/claims/QuotationPage for the TODO locators
+ * and FRAMEWORK.md's verified-vs-stubbed ledger.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Stage 2 — Quotation")

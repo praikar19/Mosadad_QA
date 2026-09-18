@@ -1,6 +1,7 @@
 package com.mosadad.testing.tests.api.claims;
 
-import com.mosadad.testing.api.ApiAssertions;`r`nimport com.mosadad.testing.base.BaseApiTest;
+import com.mosadad.testing.api.ApiAssertions;
+import com.mosadad.testing.base.BaseApiTest;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;

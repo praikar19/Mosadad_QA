@@ -1,10 +1,7 @@
 package com.mosadad.testing.tests.claims;
 
-import com.microsoft.playwright.Page;
 import com.mosadad.testing.api.WalletApiClient;
-import com.mosadad.testing.base.BaseUiTest;
-import com.mosadad.testing.browser.ActorPages;
-import com.mosadad.testing.browser.TwoActorPlaywrightManager;
+import com.mosadad.testing.base.BaseTwoActorUiTest;
 import com.mosadad.testing.config.ConfigManager;
 import com.mosadad.testing.pages.DashboardPage;
 import com.mosadad.testing.pages.LoginPage;
@@ -13,27 +10,12 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.restassured.response.Response;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 
-public class WalletTest extends BaseUiTest {
-
-    private Page claimantPage;
-    private Page atFaultPage;
-
-    @BeforeMethod(alwaysRun = true)
-    public void launchTwoBrowsers() {
-        ActorPages pages = TwoActorPlaywrightManager.openTwoBrowsers("chrome", "safari");
-        claimantPage = pages.getClaimantPage();
-        atFaultPage = pages.getAtFaultPage();
-        log.info("Launched claimant (Chrome) + at-fault (WebKit) sessions");
-    }
+public class WalletTest extends BaseTwoActorUiTest {
 
     @Test(groups = {"sanity", "wallet"})
     @Severity(SeverityLevel.CRITICAL)
@@ -70,12 +52,5 @@ public class WalletTest extends BaseUiTest {
         assertThat(uiOwnerName)
                 .as("UI owner name should match the wallet API")
                 .isEqualTo(apiOwnerName);
-    }
-
-    //@AfterMethod(alwaysRun = true)
-    public void closeTwoBrowsers() {
-        String tracePathPrefix = "target/traces/" + getClass().getSimpleName() + "-"
-                + DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS").format(LocalDateTime.now());
-        TwoActorPlaywrightManager.closeTwoBrowsers(tracePathPrefix);
     }
 }

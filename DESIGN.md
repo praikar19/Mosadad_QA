@@ -280,9 +280,7 @@ file, which is the intended path for secrets in CI. Locally,
 holds the real QA logins.
 
 The API layer's addition: `api.gateway.url.qa` — the real APIM gateway URL
-— sits right next to the older `api.base.url.qa` key for backward
-compatibility (`ApiClient` uses the gateway one; nothing else references
-the old key currently).
+`ApiClient` uses for every service call.
 
 ---
 
@@ -314,9 +312,9 @@ flowchart TD
 ```
 
 This is the same discipline the UI layer already used before this API work
-started (`ClaimRegistrationTest` etc. were already "real test, disabled
-until verified" — see `FRAMEWORK.md`). The API layer just applies it at
-much larger scale: 330 live, 73 stubs.
+started (`CreateManualRecoveryClaimTest` etc. were already "real test,
+disabled until verified" — see `FRAMEWORK.md`). The API layer just applies
+it at much larger scale: 338 live, 73 stubs.
 
 **A sharper rule inside that: some endpoints have no safe way to probe at
 all.** A handful take no id and mutate on an empty body with zero
@@ -329,7 +327,7 @@ validation (`Quotation/AcceptAll` and its siblings — full list in
 ## 8. Everyday commands
 
 ```bash
-mvn test -P api          # API suite only — no browser, ~2 min, 330 tests
+mvn test -P api          # API suite only — no browser, ~2 min, 411 tests
 mvn test -P ui            # UI suite only
 mvn test -P smoke         # Fastest gate — one login test
 mvn test                  # Full regression (default profile) — UI + API

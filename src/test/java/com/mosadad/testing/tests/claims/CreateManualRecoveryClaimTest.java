@@ -1,9 +1,6 @@
 package com.mosadad.testing.tests.claims;
 
-import com.microsoft.playwright.Page;
-import com.mosadad.testing.base.BaseUiTest;
-import com.mosadad.testing.browser.ActorPages;
-import com.mosadad.testing.browser.TwoActorPlaywrightManager;
+import com.mosadad.testing.base.BaseTwoActorUiTest;
 import com.mosadad.testing.config.ConfigManager;
 import com.mosadad.testing.pages.DashboardPage;
 import com.mosadad.testing.pages.LoginPage;
@@ -12,27 +9,11 @@ import com.mosadad.testing.pages.claims.CreateManualRecoveryClaimPage;
 import com.mosadad.testing.pages.claims.PotentialRecoveryClaimsListPage;
 import com.mosadad.testing.pages.claims.WalletPage;
 import io.qameta.allure.Description;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static com.mosadad.testing.browser.TwoActorPlaywrightManager.closeTwoBrowsers;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CreateManualRecoveryClaimTest extends BaseUiTest {
-
-    private Page claimantPage;
-    private Page atFaultPage;
-
-    @BeforeMethod(alwaysRun = true)
-    public void launchTwoBrowsers() {
-        ActorPages pages = TwoActorPlaywrightManager.openTwoBrowsers("chrome", "safari");
-        claimantPage = pages.getClaimantPage();
-        atFaultPage = pages.getAtFaultPage();
-        log.info("Launched claimant (Chrome) + at-fault (WebKit) sessions");
-    }
+public class CreateManualRecoveryClaimTest extends BaseTwoActorUiTest {
 
     @Test(enabled = false, groups = {"stage", "manual claim"})
     @Description("Creating Manual Claim for Recovery inside claimant user")
@@ -105,11 +86,4 @@ public class CreateManualRecoveryClaimTest extends BaseUiTest {
         createManualRecoveryClaimPage.uploadPoliceReport("Fast Track333.xlsx");
         createManualRecoveryClaimPage.submitPoliceReportStep();
     }
-
-    public void closeTwoBrowsers() {
-        String tracePathPrefix = "target/traces/" + getClass().getSimpleName() + "-"
-                + DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS").format(LocalDateTime.now());
-        TwoActorPlaywrightManager.closeTwoBrowsers(tracePathPrefix);
-    }
-
 }

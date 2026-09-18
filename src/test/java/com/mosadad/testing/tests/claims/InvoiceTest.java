@@ -6,7 +6,9 @@ import org.testng.annotations.Test;
 
 /**
  * STUB SUITE — Stage 3: Invoice (MOSADAD_DOMAIN.md §Stage 3). All methods
- * disabled — see ClaimRegistrationTest header comment for why.
+ * disabled — the real Invoice screen hasn't been walked live yet, so
+ * there are no verified selectors to test against. See FRAMEWORK.md's
+ * verified-vs-stubbed ledger.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Stage 3 — Invoice")

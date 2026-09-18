@@ -78,16 +78,9 @@
         </packages>
     </test>
 
-    <test name="Claim Lifecycle (stub checklist)">
-        <parameter name="browser" value="chromium"/>
-        <classes>
-            <!--class name="com.mosadad.testing.tests.claims.ClaimRegistrationTest"/>
-            <class name="com.mosadad.testing.tests.claims.QuotationTest"/>
-            <class name="com.mosadad.testing.tests.claims.InvoiceTest"/>
-            <class name="com.mosadad.testing.tests.claims.SettlementTest"/>
-            <class name="com.mosadad.testing.tests.claims.DisputeTest"/-->
-            <class name="com.mosadad.testing.tests.E2E.WalletE2ETest"/>
-        </classes>
-    </test>
+    <!-- Stage 2-4 / Dispute UI classes (QuotationTest, InvoiceTest,
+         SettlementTest, DisputeTest) are all enabled="false" stubs, not
+         wired into any suite — TestNG would error on a <classes> block with
+         no active class. See FRAMEWORK.md's verified-vs-stubbed ledger. -->
 
 </suite>

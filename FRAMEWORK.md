@@ -98,7 +98,8 @@ BaseTest                  (apiClient)
   └── BaseUiTest           (extends BaseTest + Playwright session lifecycle)
         ├── LoginUiTest                    — REAL, verified
         ├── RecoveryClaimsNavigationTest   — REAL, verified
-        ├── ClaimRegistrationTest          — stub (enabled=false)
+        ├── CreateManualRecoveryClaimTest  — real flow, stub (enabled=false, needs a 2nd role's credentials)
+        ├── WalletTest                     — REAL, verified
         ├── QuotationTest                  — stub
         ├── InvoiceTest                    — stub
         ├── SettlementTest                 — stub
@@ -116,8 +117,8 @@ BaseTest                  (apiClient)
 
 API-only tests run without a browser at all (`mvn test -P api`), same role
 as `LoginTest` in the sibling mobile framework — the fast, no-browser PR
-gate. **This is no longer a stub.** 403 test methods across the 6 backend
-microservices, 330 of them real, live-verified calls against the QA
+gate. **This is no longer a stub.** 411 test methods across the 6 backend
+microservices, 338 of them real, live-verified calls against the QA
 environment (the rest are disabled stubs for mutations that would write
 real data — see "What Is Verified vs. Stubbed" below). Auth is a real,
 reverse-engineered XOR+SHA-256 login (see `EncryptionUtil` javadoc) against
@@ -145,7 +146,10 @@ the Claimant Insurer role (`Dubaiqa@gmail.com`):
 comments in every affected class:
 
 - The actual "Create Claim" flow (Manual Entry / Police Data Entry / Fast
-  Track) — `pages/claims/ClaimRegistrationPage.java`.
+  Track) beyond the Manual Entry path already built in
+  `pages/claims/CreateManualClaimPage.java` /
+  `CreateManualRecoveryClaimPage.java` (live-verified, but its test is
+  disabled pending a second role's credentials — see `CreateManualRecoveryClaimTest`).
 - Quotation, Total Loss, Salvage screens — `pages/claims/QuotationPage.java`.
 - Invoice, Settlement, Dispute, Wallet-detail screens.
 
@@ -174,7 +178,7 @@ and `EncryptionUtil`'s javadocs for the full technical detail. In summary:
   with the RFC-9110 ProblemDetails shape. A missing/invalid bearer token
   returns a real HTTP 401. See `ApiAssertions`' javadoc for all three
   shapes and when each applies.
-- **330 of 403 API test methods are real, live-verified calls**; the
+- **338 of 411 API test methods are real, live-verified calls**; the
   other 73 are disabled (`enabled=false`) stubs for endpoints that would
   write real, hard-to-revert data into the shared QA environment (creating
   entities/users/roles/claims, deleting records, financial checkout, or
@@ -282,7 +286,7 @@ src/
         ├── credentials.properties.example  Template (committed)
         ├── testng.xml                      Full regression (default) — API suite now wired in
         ├── testng-ui.xml                   UI only, parallel
-        ├── testng-api.xml                  API only — 403 tests, 330 live-verified
+        ├── testng-api.xml                  API only — 411 tests, 338 live-verified
         └── testng-smoke.xml                Fastest gate — login only
 ```
 
@@ -300,7 +304,7 @@ mvn test -P ui
 # Smoke — single login test, fastest gate
 mvn test -P smoke
 
-# API — 403 tests across all 6 backend microservices, 330 live-verified
+# API — 411 tests across all 6 backend microservices, 338 live-verified
 mvn test -P api
 
 # Override any config value at runtime (e.g. different browser, different QA login)
@@ -413,9 +417,11 @@ you need to change retention or add a new logger.
 
 ## Next Steps (in priority order)
 
-1. Walk the real "Create Claim" screen as the Claimant Insurer and fill in
-   `ClaimRegistrationPage`'s TODO selectors; enable
-   `claimantCanRegisterClaimViaManualEntry` first.
+1. Get a second role's (At-Fault Insurer) test credentials so
+   `CreateManualRecoveryClaimTest.createManualClaim` — the real, live
+   Manual Entry flow, already built and working — can be enabled. Police
+   Data Entry and Fast Track bulk upload still need to be walked and
+   wired up after that.
 2. Get At-Fault Insurer test credentials so cross-role flows (claim
    submitted → at-fault notified → at-fault approves) can be tested
    end-to-end instead of stubbed.

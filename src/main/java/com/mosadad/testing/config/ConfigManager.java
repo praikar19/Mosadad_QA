@@ -51,15 +51,12 @@ public final class ConfigManager {
 
     private static final String DEFAULT_PLATFORM = "qa";
 
-    /** Platform is "qa" or "stage" — matches the base.url.<platform> / api.base.url.<platform> keys in config.properties. */
+    /** Platform is "qa" or "stage" — matches the base.url.<platform> / api.gateway.url.<platform> keys in config.properties. */
     public static String getBaseUrl(String platform)    { return get("base.url." + platform); }
     public static String getBaseUrl()                   { return getBaseUrl(DEFAULT_PLATFORM); }
 
     public static String getLoginUrl(String platform)    { return getBaseUrl(platform) + get("login.path"); }
     public static String getLoginUrl()                   { return getLoginUrl(DEFAULT_PLATFORM); }
-
-    public static String getApiBaseUrl(String platform)  { return get("api.base.url." + platform); }
-    public static String getApiBaseUrl()                 { return getApiBaseUrl(DEFAULT_PLATFORM); }
 
     /**
      * The shared Azure API Management gateway all six backend microservices
