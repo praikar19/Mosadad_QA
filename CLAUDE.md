@@ -89,9 +89,10 @@ The key pattern is a two-layer base hierarchy:
 
 Read these in order:
 
-1. `MOSADAD_DOMAIN.md` — what the app actually does
-2. `FRAMEWORK.md` — what is verified vs. what is still a TODO or stub
-3. `README.md` — the quick start and execution flow
+1. `FRAMEWORK.md` — combined reference: what the app actually does (Part 1),
+   how the suite is built (Part 2), and what is verified vs. what is still a
+   TODO or stub (Part 3)
+2. `README.md` — the quick start and execution flow
 
 This avoids trusting selectors or API endpoints that have not been live-verified.
 

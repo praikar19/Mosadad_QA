@@ -140,9 +140,7 @@ For most contributors, this is the cleanest path:
 ## Documentation map
 
 - [CLAUDE.md](CLAUDE.md) — repo guidance and contributor workflow
-- [FRAMEWORK.md](FRAMEWORK.md) — why each technology/pattern was chosen, plus the full verified-vs-stubbed ledger
-- [DESIGN.md](DESIGN.md) — how the framework fits together: package map, base-class hierarchy, request flow
-- [MOSADAD_DOMAIN.md](MOSADAD_DOMAIN.md) — app behavior and domain context
+- [FRAMEWORK.md](FRAMEWORK.md) — combined reference: app domain (claim lifecycle, actors, SLAs), design/architecture (package map, base-class hierarchy, request flow), why each technology/pattern was chosen, and the full verified-vs-stubbed ledger
 
 ## Project layout
 

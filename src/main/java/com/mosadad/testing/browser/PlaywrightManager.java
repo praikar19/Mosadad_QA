@@ -35,9 +35,8 @@ public final class PlaywrightManager {
     public static Page launch(String browserName) {
         Playwright playwright = Playwright.create();
         BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
-                .setHeadless(false)
+                .setHeadless(ConfigManager.isHeadless())
                 .setSlowMo(ConfigManager.getSlowMoMs());
-        //browsers = chromium.launch(new BrowserType.LaunchOptions().setHeadless(ConfigManager.isHeadless()));
         BrowserType browserType = switch (browserName == null ? "chromium" : browserName.toLowerCase()) {
             case "firefox" -> playwright.firefox();
             case "webkit" -> playwright.webkit();

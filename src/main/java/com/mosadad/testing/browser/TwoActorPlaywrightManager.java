@@ -80,9 +80,7 @@ public final class TwoActorPlaywrightManager {
      */
     private static Browser launchBrowser(Playwright playwright, String browserName) {
         BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
-                .setHeadless(false);
-
-        //ConfigManager.isHeadless()
+                .setHeadless(ConfigManager.isHeadless());
 
         return switch (browserName == null ? "chromium" : browserName.toLowerCase()) {
             case "firefox" -> playwright.firefox().launch(options);
