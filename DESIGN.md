@@ -102,13 +102,16 @@ com.mosadad.testing
 ```
 test/java/com.mosadad.testing
 │
-├── base/                   ← The three-layer test-class hierarchy — see §3
+├── base/                   ← The test-class hierarchy — see §3
 │   ├── BaseTest              Initialises apiClient (every test gets one)
-│   ├── BaseUiTest             extends BaseTest, adds Playwright lifecycle
+│   ├── BaseUiTest             extends BaseTest, one Playwright session per test
+│   ├── BaseTwoActorUiTest     extends BaseTest, two concurrent sessions (claimant + at-fault)
 │   └── BaseApiTest            extends BaseTest, adds per-service spec shortcuts
 │
 └── tests/
-    ├── auth/, navigation/, claims/, E2E/, utils/   ← UI tests (Page Objects + Playwright)
+    ├── auth/, navigation/, utils/   ← single-actor UI tests
+    ├── claims/                      ← two-actor UI tests + ClaimLifecycleFixtures
+    │                                  (shared setup for Quotation/Invoice/SettlementTest — see §7)
     │
     └── api/                                         ← API tests — see §5
         ├── AuthApiTest                                 cross-cutting login/security tests
@@ -138,8 +141,15 @@ classDiagram
     }
     class BaseUiTest {
         +Page page
-        +setupBrowser() @BeforeMethod
-        +teardownBrowser() @AfterMethod
+        +launchBrowser() @BeforeMethod
+        +closeBrowser() @AfterMethod
+        +loginWithCachedSession(platform, userKey)
+    }
+    class BaseTwoActorUiTest {
+        +Page claimantPage
+        +Page atFaultPage
+        +launchTwoBrowsers() @BeforeMethod
+        +closeTwoBrowsers() @AfterMethod
     }
     class BaseApiTest {
         +claims() tenant() inthub() ...
@@ -148,18 +158,23 @@ classDiagram
         +entityId() currentUserId()
     }
     BaseTest <|-- BaseUiTest
+    BaseTest <|-- BaseTwoActorUiTest
     BaseTest <|-- BaseApiTest
     BaseUiTest <|-- LoginUiTest
     BaseUiTest <|-- RecoveryClaimsNavigationTest
+    BaseTwoActorUiTest <|-- WalletTest
+    BaseTwoActorUiTest <|-- QuotationTest
     BaseApiTest <|-- AuthApiTest
     BaseApiTest <|-- EntityApiTest
     BaseApiTest <|-- ClaimApiTest
 ```
 
 Every test class ultimately extends `BaseTest`, which is why every test —
-UI or API — has `apiClient` available. `BaseUiTest` layers on a Playwright
-browser session; `BaseApiTest` layers on short, readable accessors so test
-bodies read like `claims().get("/Claim/Latest/" + entityId())` instead of
+UI or API — has `apiClient` available. `BaseUiTest` layers on one
+Playwright browser session; `BaseTwoActorUiTest` is the sibling for tests
+needing two concurrently-logged-in sessions (claimant + at-fault — one
+insurer submits, the other receives/acts); `BaseApiTest` layers on short,
+readable accessors so test bodies read like `claims().get("/Claim/Latest/" + entityId())` instead of
 spelling out the request spec every time.
 
 This mirrors the sibling `ShopTestApp-Java-Mobile-Testing` framework's

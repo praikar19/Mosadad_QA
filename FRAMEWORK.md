@@ -119,17 +119,19 @@ nothing over calling `page.locator()` directly.
 
 ```
 BaseTest                  (apiClient)
-  └── BaseUiTest           (extends BaseTest + Playwright session lifecycle)
-        ├── LoginUiTest                    — REAL, verified
-        ├── RecoveryClaimsNavigationTest   — REAL, verified
-        ├── CreateManualRecoveryClaimTest  — real flow, stub (enabled=false, needs a 2nd role's credentials)
-        ├── WalletTest                     — REAL, verified
-        ├── QuotationTest                  — stub
-        ├── InvoiceTest                    — stub
-        ├── SettlementTest                 — stub
-        └── DisputeTest                    — stub
-
-  └── BaseApiTest           (extends BaseTest — API only, no browser)
+  ├── BaseUiTest            (extends BaseTest + one Playwright session lifecycle)
+  │     ├── LoginUiTest                    — REAL, verified
+  │     └── RecoveryClaimsNavigationTest   — REAL, verified
+  │
+  ├── BaseTwoActorUiTest     (extends BaseTest + two concurrent Playwright sessions — claimant + at-fault)
+  │     ├── WalletTest                     — REAL, verified
+  │     ├── CreateManualRecoveryClaimTest  — real flow, stub (enabled=false, uses the old pre-2026-09-07 gate screen — see ClaimLifecycleFixtures' Javadoc)
+  │     ├── QuotationTest                  — one real method recovered (stub, enabled=false); rest still stub
+  │     ├── InvoiceTest                    — one real method recovered (stub, enabled=false); rest still stub
+  │     ├── SettlementTest                 — one real method recovered (stub, enabled=false — ends in a real ATB Pay payment, see its class Javadoc before enabling); rest still stub
+  │     └── DisputeTest                    — stub
+  │
+  └── BaseApiTest            (extends BaseTest — API only, no browser)
         ├── AuthApiTest                    — REAL, verified (tenant/User/Login)
         ├── tests/api/tenant/*Test         — REAL, verified (10 classes)
         ├── tests/api/inthub/*Test         — REAL, verified (5 classes)
@@ -138,6 +140,15 @@ BaseTest                  (apiClient)
         ├── tests/api/invoice/*Test        — REAL, verified (4 classes)
         └── tests/api/claims/*Test         — REAL, verified (20 classes)
 ```
+
+`QuotationTest`, `InvoiceTest`, and `SettlementTest`'s real methods share their
+setup through `tests/claims/ClaimLifecycleFixtures` (package-private, not a
+`@Test` class itself) — each stage's fixture method takes the previous
+stage's result and returns its own, since Stage 2 needs an accepted claim,
+Stage 3 needs an accepted quotation, and Stage 4 needs an accepted invoice.
+See that class's Javadoc for the full provenance: it was recovered from an
+original one-method, six-stage two-actor E2E draft and split to match how
+the rest of this suite is organized, one stage per class.
 
 API-only tests run without a browser at all (`mvn test -P api`), same role
 as `LoginTest` in the sibling mobile framework — the fast, no-browser PR
@@ -442,20 +453,28 @@ you need to change retention or add a new logger.
 
 ## Next Steps (in priority order)
 
-1. Get a second role's (At-Fault Insurer) test credentials so
-   `CreateManualRecoveryClaimTest.createManualClaim` — the real, live
-   Manual Entry flow, already built and working — can be enabled. Police
-   Data Entry and Fast Track bulk upload still need to be walked and
-   wired up after that.
-2. Get At-Fault Insurer test credentials so cross-role flows (claim
-   submitted → at-fault notified → at-fault approves) can be tested
-   end-to-end instead of stubbed.
+1. A second role's (At-Fault Insurer) test credential already exists
+   (`stage.claimant.email/password.dnl`) and is what
+   `CreateManualRecoveryClaimTest`, `QuotationTest`, `InvoiceTest`, and
+   `SettlementTest`'s real-but-disabled methods all log in as — it hasn't
+   been re-confirmed live in this pass, though. Before enabling any of
+   them: re-verify that login still works, then re-verify each stage
+   against the real app (the claim-creation step in particular changed
+   live on 2026-09-07 — see `ClaimLifecycleFixtures`' Javadoc — so
+   `CreateManualRecoveryClaimTest` specifically may now be exercising a
+   screen that no longer exists). `SettlementTest`'s method ends in a
+   real ATB Pay payment — see its class Javadoc and CLAUDE.md's
+   risk-level guidance before enabling it. Police Data Entry and Fast
+   Track bulk upload still need to be walked and wired up separately —
+   neither was covered by the recovered draft.
+2. Get Regulator and Mosadad Admin test credentials for SLA-violation and
+   dispute-history visibility tests, and governance/access-management
+   tests — `DisputeTest` is still a pure stub, not covered by anything
+   recovered here.
 3. Get sign-off to enable the 73 disabled API mutation stubs against
    disposable QA fixtures (a throwaway entity/claim/role per write-heavy
    test class) — see each `*ApiTest` class's `enabled=false` methods and
    "Known unscoped bulk-action endpoints" above before enabling anything
    that isn't id-scoped to a disposable fixture.
-4. Get Regulator and Mosadad Admin test credentials for SLA-violation and
-   dispute-history visibility tests, and governance/access-management tests.
-5. Report the confirmed backend bugs (see "Confirmed backend bugs found
+4. Report the confirmed backend bugs (see "Confirmed backend bugs found
    while building this suite" above) to the Mosadad backend team.
