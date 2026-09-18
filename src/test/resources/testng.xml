@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Full regression — everything the framework currently knows about.
+  Stage 1-4 / Dispute / Wallet classes are present but their methods are
+  enabled="false" (TODO locators) — they show up as skipped, acting as a
+  visible checklist of what's left to wire up. See MOSADAD_DOMAIN.md and
+  FRAMEWORK.md for the full picture.
+  Run: mvn test   (regression is the default profile)
+-->
+<suite name="Mosadad — Full Regression" verbose="1" parallel="none" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!--test name="Test Data — Excel">
+        <classes>
+            <class name="com.mosadad.testing.tests.utils.ExcelUtilsTest"/>
+        </classes>
+    </test-->
+
+    <!--test name="Auth — UI">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <class name="com.mosadad.testing.tests.auth.LoginUiTest"/>
+        </classes>
+    </test-->
+
+    <!--test name="Entity Navigation — UI">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <class name="com.mosadad.testing.tests.navigation.RecoveryClaimsNavigationTest"/>
+        </classes>
+    </test-->
+
+    <test name="Auth API">
+        <classes>
+            <class name="com.mosadad.testing.tests.api.AuthApiTest"/>
+        </classes>
+    </test>
+
+    <test name="Tenant API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.tenant"/>
+        </packages>
+    </test>
+
+    <test name="IntHub API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.inthub"/>
+        </packages>
+    </test>
+
+    <test name="Quotation API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.quotation"/>
+        </packages>
+    </test>
+
+    <test name="Settlement API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.settlement"/>
+        </packages>
+    </test>
+
+    <test name="Invoice API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.invoice"/>
+        </packages>
+    </test>
+
+    <test name="Claims API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.claims"/>
+        </packages>
+    </test>
+
+    <test name="Claim Lifecycle (stub checklist)">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <!--class name="com.mosadad.testing.tests.claims.ClaimRegistrationTest"/>
+            <class name="com.mosadad.testing.tests.claims.QuotationTest"/>
+            <class name="com.mosadad.testing.tests.claims.InvoiceTest"/>
+            <class name="com.mosadad.testing.tests.claims.SettlementTest"/>
+            <class name="com.mosadad.testing.tests.claims.DisputeTest"/-->
+            <class name="com.mosadad.testing.tests.E2E.WalletE2ETest"/>
+        </classes>
+    </test>
+
+</suite>

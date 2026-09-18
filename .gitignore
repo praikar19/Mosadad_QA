@@ -1,0 +1,14 @@
+# Maven build output
+target/
+
+# Secrets — never commit real credentials
+src/test/resources/credentials.properties
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# macOS
+.DS_Store

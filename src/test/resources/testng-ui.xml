@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  UI-only suite — real, verified tests (Login + Entity Navigation).
+  Run: mvn test -P ui
+-->
+<suite name="Mosadad — UI Tests" verbose="1" parallel="tests" thread-count="2">
+
+    <listeners>
+        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Auth — UI">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <class name="com.mosadad.testing.tests.auth.LoginUiTest"/>
+        </classes>
+    </test>
+
+    <test name="Entity Navigation — UI">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <class name="com.mosadad.testing.tests.navigation.RecoveryClaimsNavigationTest"/>
+        </classes>
+    </test>
+
+</suite>

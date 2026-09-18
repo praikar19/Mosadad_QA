@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Smoke suite — fastest health-check, run on every commit.
+  Run: mvn test -P smoke
+-->
+<suite name="Mosadad — Smoke" verbose="1" parallel="none" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Smoke — Login">
+        <parameter name="browser" value="chromium"/>
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="regression"/>
+                <include name="sanity"/>
+                <include name="functional"/>
+                <include name="e2e"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.mosadad.testing.tests.auth.LoginUiTest"/>
+        </classes>
+    </test>
+
+</suite>

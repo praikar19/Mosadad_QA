@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  API-only suite — no browser required. Covers all 6 backend microservices
+  behind the shared Azure API Management gateway (claims, inthub, invoice,
+  quotation, settlement, tenant) — 403 test methods total, 330 of them real,
+  live-verified calls against the QA environment and 73 disabled stubs for
+  mutations that would write real data (see each test class's javadoc for
+  exactly what's stubbed and why). See FRAMEWORK.md and MOSADAD_DOMAIN.md
+  for the full picture of what's verified vs. still pending sign-off.
+  Run: mvn test -P api
+-->
+<suite name="Mosadad — API Tests" verbose="1" parallel="none" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Auth API">
+        <classes>
+            <class name="com.mosadad.testing.tests.api.AuthApiTest"/>
+        </classes>
+    </test>
+
+    <test name="Tenant API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.tenant"/>
+        </packages>
+    </test>
+
+    <test name="IntHub API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.inthub"/>
+        </packages>
+    </test>
+
+    <test name="Quotation API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.quotation"/>
+        </packages>
+    </test>
+
+    <test name="Settlement API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.settlement"/>
+        </packages>
+    </test>
+
+    <test name="Invoice API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.invoice"/>
+        </packages>
+    </test>
+
+    <test name="Claims API">
+        <packages>
+            <package name="com.mosadad.testing.tests.api.claims"/>
+        </packages>
+    </test>
+
+</suite>
