@@ -76,6 +76,7 @@ com.mosadad.testing
 │
 ├── browser/                ← Playwright session management
 │   ├── PlaywrightManager     ThreadLocal<Playwright/Browser/Context/Page>
+│   ├── AuthStateCache        JVM-wide cached login (storageState) — real login once per user, not once per @Test
 │   ├── TwoActorPlaywrightManager   Two simultaneous logged-in sessions (cross-role flows)
 │   └── ActorPages            Bundles a role's Page Objects together
 │

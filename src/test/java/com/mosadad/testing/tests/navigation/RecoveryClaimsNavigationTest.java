@@ -1,7 +1,6 @@
 package com.mosadad.testing.tests.navigation;
 
 import com.mosadad.testing.base.BaseUiTest;
-import com.mosadad.testing.config.ConfigManager;
 import com.mosadad.testing.constants.Routes;
 import com.mosadad.testing.pages.DashboardPage;
 import com.mosadad.testing.pages.RecoveryClaimsHubPage;
@@ -23,13 +22,15 @@ public class RecoveryClaimsNavigationTest extends BaseUiTest {
 
     // Runs after BaseUiTest.launchBrowser() — TestNG always runs superclass
     // @BeforeMethod methods before subclass ones, so no explicit ordering needed.
+    //
+    // Uses the cached-session login (see BaseUiTest.loginWithCachedSession)
+    // instead of driving the real login form: this method runs once per
+    // @Test below (8x per suite run), and only navigation is under test
+    // here, not login itself — LoginUiTest already covers that. The real
+    // login now happens at most once for the whole run instead of 8 times.
     @BeforeMethod(alwaysRun = true)
     public void loginAndOpenHubForQAPlatform() {
-        navigateToLogin();
-        DashboardPage dashboard = loginPage.login(
-                ConfigManager.getEmail("qa", "dubai"),
-                ConfigManager.getPassword("qa", "dubai")
-        );
+        DashboardPage dashboard = loginWithCachedSession("qa", "dubai");
         hub = dashboard.openRecoveryClaims();
         assertThat(hub.isLoaded()).as("Recovery Claims hub should load").isTrue();
     }

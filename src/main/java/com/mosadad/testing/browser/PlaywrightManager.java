@@ -53,7 +53,52 @@ public final class PlaywrightManager {
         };
 
         Browser browser = browserType.launch(options);
-        BrowserContext context = browser.newContext();
+        Page page = newContextAndPage(browser, null);
+
+        PLAYWRIGHT.set(playwright);
+        BROWSER.set(browser);
+
+        log.debug("Playwright[{}] launched on thread: {}", browserName, Thread.currentThread().getName());
+        return page;
+    }
+
+    /**
+     * Discards the current context/page and opens a fresh one on the same
+     * already-launched Browser, seeded with the given Playwright
+     * storageState JSON (cookies + localStorage) instead of starting
+     * blank — see AuthStateCache. Same per-test isolation as launch()
+     * (still a brand-new context, not a reused one), just pre-authenticated
+     * so callers can navigate straight past the login form.
+     *
+     * launch() must have already run on this thread (usually via
+     * BaseUiTest's own @BeforeMethod) — this only swaps the context, it
+     * doesn't launch a new Browser.
+     */
+    public static Page reopenWithStorageState(String storageState) {
+        Browser browser = BROWSER.get();
+        if (browser == null) {
+            throw new IllegalStateException(
+                "No Playwright Browser for thread [" + Thread.currentThread().getName() +
+                "]. Call launch() first — reopenWithStorageState() only swaps the context.");
+        }
+
+        BrowserContext oldContext = CONTEXT.get();
+        if (oldContext != null) {
+            oldContext.close(); // blank context, nothing happened on it worth a trace
+        }
+
+        Page page = newContextAndPage(browser, storageState);
+        log.debug("Reopened context with cached storage state on thread: {}", Thread.currentThread().getName());
+        return page;
+    }
+
+    /** Shared by launch() and reopenWithStorageState(): one new context + page on the given browser, with the usual timeouts/tracing, optionally seeded from a storageState JSON string. Updates CONTEXT/PAGE. */
+    private static Page newContextAndPage(Browser browser, String storageState) {
+        Browser.NewContextOptions options = new Browser.NewContextOptions();
+        if (storageState != null) {
+            options.setStorageState(storageState);
+        }
+        BrowserContext context = browser.newContext(options);
         context.setDefaultTimeout(ConfigManager.getExplicitWaitSeconds() * 1000);
         context.setDefaultNavigationTimeout(ConfigManager.getNavigationTimeoutSeconds() * 1000);
         context.tracing().start(new Tracing.StartOptions()
@@ -62,13 +107,8 @@ public final class PlaywrightManager {
                 .setSources(true));
 
         Page page = context.newPage();
-
-        PLAYWRIGHT.set(playwright);
-        BROWSER.set(browser);
         CONTEXT.set(context);
         PAGE.set(page);
-
-        log.debug("Playwright[{}] launched on thread: {}", browserName, Thread.currentThread().getName());
         return page;
     }
 

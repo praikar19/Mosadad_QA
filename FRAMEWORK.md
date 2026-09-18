@@ -80,6 +80,30 @@ tears all four down together in `close()`.
 
 ---
 
+## Decision — Cached login via Playwright storageState
+
+`RecoveryClaimsNavigationTest` used to log in through the real UI form in
+its own `@BeforeMethod` — once per `@Test` method, 8 real logins per suite
+run just to get to the screen actually under test. `AuthStateCache` fixes
+this the same way `ApiClient` already caches its access token: log in for
+real exactly once per platform+user per JVM run (double-checked locking),
+capture the authenticated `BrowserContext`'s `storageState()` (cookies +
+localStorage — wherever the app's session actually lives, storageState
+captures both), and cache that JSON string in memory for the rest of the
+run. Every later test that needs to already be logged in calls
+`BaseUiTest.loginWithCachedSession(platform, userKey)`, which reopens its
+already-launched browser's context seeded with that cached state
+(`PlaywrightManager.reopenWithStorageState()`) instead of a blank one —
+still a fresh, isolated context per test method, just pre-authenticated.
+
+Deliberately **not** persisted to disk across separate `mvn test` runs —
+only kept in memory for the one JVM run — so a stale/expired token from a
+previous run can never leak into a later one. `LoginUiTest`, which tests
+the login form itself, doesn't use this at all and keeps driving
+`LoginPage` for real.
+
+---
+
 ## Decision — Page Objects without Page Factory, using plain selector strings
 
 Locators are stored as `private static final String` constants (CSS/text
@@ -245,7 +269,8 @@ src/
 │   │   ├── EncryptionUtil.java     Reverse-engineered XOR+SHA-256 login field obfuscation
 │   │   └── WalletApiClient.java    Third-party ATB Pay wallet portal client (separate system)
 │   ├── browser/
-│   │   └── PlaywrightManager.java  ThreadLocal<Playwright/Browser/Context/Page>
+│   │   ├── PlaywrightManager.java  ThreadLocal<Playwright/Browser/Context/Page>
+│   │   └── AuthStateCache.java     JVM-wide cached storageState login — see "Decision — Cached login" below
 │   ├── config/
 │   │   └── ConfigManager.java      Reads config.properties + credentials.properties; -D overrides
 │   ├── constants/
