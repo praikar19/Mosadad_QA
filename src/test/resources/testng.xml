@@ -22,19 +22,19 @@
         </classes>
     </test-->
 
-    <!--test name="Auth — UI">
+    <test name="Auth — UI">
         <parameter name="browser" value="chromium"/>
         <classes>
             <class name="com.mosadad.testing.tests.auth.LoginUiTest"/>
         </classes>
-    </test-->
+    </test>
 
-    <!--test name="Entity Navigation — UI">
+    <test name="Entity Navigation — UI">
         <parameter name="browser" value="chromium"/>
         <classes>
             <class name="com.mosadad.testing.tests.navigation.RecoveryClaimsNavigationTest"/>
         </classes>
-    </test-->
+    </test>
 
     <test name="Auth API">
         <classes>
