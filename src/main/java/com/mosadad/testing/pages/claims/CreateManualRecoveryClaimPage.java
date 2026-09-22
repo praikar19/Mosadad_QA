@@ -5,6 +5,8 @@ import com.mosadad.testing.pages.BasePage;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.FilePayload;
+import io.qameta.allure.Step;
 
 import java.nio.file.Paths;
 
@@ -82,36 +84,95 @@ public class CreateManualRecoveryClaimPage extends BasePage {
     private static final String REPORT_PROVIDER_SELECT = "select.report-provider-select";
     private static final String POLICE_REPORT_FILE_INPUT = "input[type='file']";
 
+    @Step("Select report provider '{0}'")
     public void selectReportProvider(String providerName) {
         locator(REPORT_PROVIDER_SELECT).selectOption(providerName);
     }
 
+    @Step("Upload police report file: {0}")
     public void uploadPoliceReport(String filePath) {
         locator(POLICE_REPORT_FILE_INPUT).setInputFiles(Paths.get(filePath));
     }
 
+    /**
+     * Same upload, but from in-memory bytes rather than a file already on
+     * disk — lets negative tests (oversized file, unsupported format) build
+     * their fixture inline instead of committing binary files to the repo.
+     */
+    // {2} (content) is deliberately left out of the step label — Allure
+    // interpolates it via byte[].toString(), which is a meaningless object
+    // reference (e.g. "[B@6f94fa3e"), not the byte count.
+    @Step("Upload police report file: {0} ({1})")
+    public void uploadPoliceReport(String fileName, String mimeType, byte[] content) {
+        locator(POLICE_REPORT_FILE_INPUT).setInputFiles(new FilePayload(fileName, mimeType, content));
+    }
+
+    /**
+     * Client-side upload validation message — confirmed live 2026-09-21 for
+     * an oversized file ("Error: File size exceeds the maximum limit of 10
+     * MB."). Matched by its "Error:" prefix rather than a guessed CSS class:
+     * that prefix is the only part confirmed to also cover other upload
+     * validation failures (e.g. an unsupported file format) — exact wording
+     * for those hasn't been captured live yet.
+     */
+    private static final String UPLOAD_ERROR_PREFIX = "Error:";
+
+    @Step("Check whether an upload validation error is visible")
+    public boolean isFileUploadErrorVisible() {
+        try {
+            getLocatorByText(UPLOAD_ERROR_PREFIX).first().waitFor(new Locator.WaitForOptions().setTimeout(5000));
+        } catch (com.microsoft.playwright.PlaywrightException timeout) {
+            log.debug("Upload error message did not become visible in time: {}", timeout.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public String getFileUploadErrorMessage() {
+        return getLocatorByText(UPLOAD_ERROR_PREFIX).first().innerText();
+    }
+
+    /** "Processing Police Report" confirmation dialog shown on Submit (screenshot-verified 2026-09-21). */
+    private static final String PROCESSING_POPUP_HEADING = "text=Processing Police Report";
+
+    @Step("Check whether the 'Processing Police Report' confirmation popup is visible")
+    public boolean isProcessingPopupVisible() {
+        try {
+            locator(PROCESSING_POPUP_HEADING).waitFor(new Locator.WaitForOptions().setTimeout(10000));
+        } catch (com.microsoft.playwright.PlaywrightException timeout) {
+            log.debug("Processing Police Report popup did not become visible in time: {}", timeout.getMessage());
+            return false;
+        }
+        return true;
+    }
+
     /** Advances Step 1 -> Step 2 without a police report — the pure Manual Entry path. */
+    @Step("Click 'Skip' (proceed without a police report)")
     public CreateManualRecoveryClaimPage skipPoliceReportUpload() {
         getLocatorByRole(AriaRole.BUTTON, "Skip").click();
         return this;
     }
 
     /** Advances Step 1 -> Step 2 after selectReportProvider()/uploadPoliceReport() — the Police Data Entry path. */
+    @Step("Click 'Submit' (police report step)")
     public CreateManualRecoveryClaimPage submitPoliceReportStep() {
         getLocatorByRole(AriaRole.BUTTON, "Submit").click();
         return this;
     }
 
+    @Step("Click 'Continue' on the Processing Police Report popup")
     public CreateManualClaimPage continueProcessingPoliceReportPopup() {
         getLocatorByRole(AriaRole.BUTTON, "Continue").click();
         return new CreateManualClaimPage(page);
     }
 
+    @Step("Click 'Cancel' on the Processing Police Report popup")
     public CreateManualRecoveryClaimPage cancelProcessingPoliceReportPopup() {
         getLocatorByRole(AriaRole.BUTTON, "Cancel").click();
         return this;
     }
 
+    @Step("Close the Processing Police Report popup")
     public CreateManualRecoveryClaimPage closeProcessingPoliceReportPopup() {
         getLocatorByRole(AriaRole.BUTTON, "×").click();
         return this;

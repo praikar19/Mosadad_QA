@@ -5,12 +5,14 @@
   UI-only suite — real, verified tests (Login + Entity Navigation).
   Run: mvn test -P ui
 -->
+<!--
+  TestListener + AllureTestNg are NOT declared here — see BaseTest's
+  Javadoc: TestListener is registered once via @Listeners on BaseTest, and
+  AllureTestNg auto-registers itself via TestNG's ServiceLoader. Declaring
+  either again here would double-register it and corrupt Allure's report
+  (confirmed live: orphaned/missing failure screenshots).
+-->
 <suite name="Mosadad — UI Tests" verbose="1" parallel="tests" thread-count="2">
-
-    <listeners>
-        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
-        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
-    </listeners>
 
     <test name="Auth — UI">
         <parameter name="browser" value="chromium"/>
@@ -23,6 +25,13 @@
         <parameter name="browser" value="chromium"/>
         <classes>
             <class name="com.mosadad.testing.tests.navigation.RecoveryClaimsNavigationTest"/>
+        </classes>
+    </test>
+
+    <test name="Create Manual Recovery Claim — Upload Gate">
+        <parameter name="browser" value="chromium"/>
+        <classes>
+            <class name="com.mosadad.testing.tests.claims.CreateManualRecoveryClaimTest"/>
         </classes>
     </test>
 

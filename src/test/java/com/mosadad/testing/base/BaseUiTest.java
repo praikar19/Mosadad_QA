@@ -7,6 +7,7 @@ import com.mosadad.testing.constants.Routes;
 import com.mosadad.testing.pages.DashboardPage;
 import com.mosadad.testing.pages.LoginPage;
 import com.microsoft.playwright.Page;
+import io.qameta.allure.Step;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Optional;
@@ -61,6 +62,7 @@ public abstract class BaseUiTest extends BaseTest {
      * that exercises the real login form — see LoginUiTest, which keeps
      * using navigateToLogin() + loginPage.login(...) directly.
      */
+    @Step("Log in with cached session (platform={0}, user={1})")
     protected DashboardPage loginWithCachedSession(String platform, String userKey) {
         String storageState = AuthStateCache.ensureLoggedIn(platform, userKey);
         page = PlaywrightManager.reopenWithStorageState(storageState);

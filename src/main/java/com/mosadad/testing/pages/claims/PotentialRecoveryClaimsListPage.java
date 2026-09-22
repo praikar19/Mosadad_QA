@@ -3,6 +3,7 @@ package com.mosadad.testing.pages.claims;
 import com.mosadad.testing.constants.Routes;
 import com.microsoft.playwright.Page;
 import com.mosadad.testing.pages.BasePage;
+import io.qameta.allure.Step;
 
 /**
  * /entity-portal/potential-recovery-claims — Recovery Claim Records module,
@@ -25,6 +26,7 @@ public class PotentialRecoveryClaimsListPage extends BasePage {
         return currentUrl().contains(Routes.POTENTIAL_RECOVERY_CLAIMS);
     }
 
+    @Step("Click 'Create New Recovery Claim'")
     public CreateManualRecoveryClaimPage clickCreateNewRecoveryClaimBtn(){
         click(CREATE_NEW_RECOVERY_CLAIM_BTN);
         return new CreateManualRecoveryClaimPage(page);
