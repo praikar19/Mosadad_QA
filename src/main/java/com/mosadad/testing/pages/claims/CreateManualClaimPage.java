@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.mosadad.testing.constants.Routes;
 import com.mosadad.testing.pages.BasePage;
+import io.qameta.allure.Step;
 
 import java.nio.file.Paths;
 
@@ -17,6 +18,31 @@ public class CreateManualClaimPage extends BasePage {
 
     public boolean isLoaded() {
         return currentUrl().contains(Routes.CREATE_MANUAL_CLAIMS);
+    }
+
+    /**
+     * ngx-toastr success toast — same #toast-container widget as
+     * LoginPage's error toast (see LoginPage.ERROR_TOAST), just the
+     * "toast-success" variant. Wording isn't confirmed live yet for this
+     * flow (police-report processing on Continue), so callers should
+     * capture/log getSuccessToastMessage() rather than assert an exact
+     * string until it's verified.
+     */
+    private static final String SUCCESS_TOAST = "#toast-container .toast-success";
+
+    @Step("Check whether a success toast is visible")
+    public boolean isSuccessToastVisible() {
+        try {
+            waitVisible(SUCCESS_TOAST);
+        } catch (com.microsoft.playwright.PlaywrightException timeout) {
+            log.debug("Success toast did not become visible in time: {}", timeout.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public String getSuccessToastMessage() {
+        return getText(SUCCESS_TOAST + " .toast-message");
     }
 
     /* ── Accident Details — every id here is unique on the page ─────────── */

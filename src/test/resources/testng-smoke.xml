@@ -5,12 +5,14 @@
   Smoke suite — fastest health-check, run on every commit.
   Run: mvn test -P smoke
 -->
+<!--
+  TestListener + AllureTestNg are NOT declared here — see BaseTest's
+  Javadoc: TestListener is registered once via @Listeners on BaseTest, and
+  AllureTestNg auto-registers itself via TestNG's ServiceLoader. Declaring
+  either again here would double-register it and corrupt Allure's report
+  (confirmed live: orphaned/missing failure screenshots).
+-->
 <suite name="Mosadad — Smoke" verbose="1" parallel="none" thread-count="1">
-
-    <listeners>
-        <listener class-name="com.mosadad.testing.listeners.TestListener"/>
-        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
-    </listeners>
 
     <test name="Smoke — Login">
         <parameter name="browser" value="chromium"/>

@@ -1,6 +1,7 @@
 package com.mosadad.testing.pages;
 
 import com.microsoft.playwright.Page;
+import io.qameta.allure.Step;
 
 /**
  * /auth/login — locators verified live against the QA environment on
@@ -30,6 +31,9 @@ public class LoginPage extends BasePage {
      *   - success: DashboardPage.isLoaded() already waits for its content.
      *   - failure: isErrorToastVisible() / getErrorToastMessage() wait for the toast.
      */
+    // Step label deliberately references only {0} (email) — password is
+    // argument {1} and must never be interpolated into a report.
+    @Step("Log in as {0}")
     public DashboardPage login(String email, String password) {
         fill(EMAIL_INPUT, email);
         fill(PASSWORD_INPUT, password);

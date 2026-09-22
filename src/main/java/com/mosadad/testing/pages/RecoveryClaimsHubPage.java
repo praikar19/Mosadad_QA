@@ -3,6 +3,7 @@ package com.mosadad.testing.pages;
 import com.mosadad.testing.constants.Routes;
 import com.microsoft.playwright.Page;
 import com.mosadad.testing.pages.claims.PotentialRecoveryClaimsListPage;
+import io.qameta.allure.Step;
 
 /**
  * /entity-landing/recovery-claims — verified live 2026-08-30. Three module
@@ -28,6 +29,7 @@ public class RecoveryClaimsHubPage extends BasePage {
     }
 
     /** Clicks a module link by its exact visible text, e.g. "Recovery Claims List", and waits for the SPA route change. */
+    @Step("Open '{0}' module")
     private void openModuleLink(String linkText) {
         page.locator(NAV_LINK, new Page.LocatorOptions().setHasText(linkText)).click();
         page.waitForURL(url -> !url.contains(Routes.RECOVERY_CLAIMS_HUB),

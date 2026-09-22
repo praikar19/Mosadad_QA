@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import io.qameta.allure.Step;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,14 +64,17 @@ public abstract class BasePage {
         return page.getByTestId(testId);
     }
 
+    @Step("Fill \"{1}\" into {0}")
     protected void fill(String selector, String text) {
         page.locator(selector).fill(text);
     }
 
+    @Step("Click {0}")
     protected void click(String selector) {
         page.locator(selector).click();
     }
 
+    @Step("Read text from {0}")
     protected String getText(String selector) {
         return page.locator(selector).innerText();
     }
