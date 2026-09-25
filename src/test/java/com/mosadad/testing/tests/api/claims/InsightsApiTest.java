@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — Insights tag. A diagnostic endpoint that fires a test event into Azure Application Insights — not a data read, so the assertion is on the acknowledgement, not business data. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Insights")
 public class InsightsApiTest extends BaseApiTest {

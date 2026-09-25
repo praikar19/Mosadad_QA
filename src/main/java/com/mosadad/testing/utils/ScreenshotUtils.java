@@ -22,14 +22,14 @@ public final class ScreenshotUtils {
 
     private ScreenshotUtils() {}
 
-    /**
-     * Takes a screenshot, saves it to target/screenshots/, and attaches it
-     * to the current Allure report step so it is visible inline in the report.
-     */
+    /** Saves a screenshot to target/screenshots/ and attaches it to the current Allure step. */
     public static void captureAndAttach(Page page, String testName) {
         if (page == null) return;
         try {
             byte[] screenshot = page.screenshot(new Page.ScreenshotOptions().setType(ScreenshotType.PNG));
+
+            log.debug("Allure current test case/step at screenshot time: {}",
+                    io.qameta.allure.Allure.getLifecycle().getCurrentTestCaseOrStep());
 
             Allure.addAttachment(
                     "Screenshot — " + testName,

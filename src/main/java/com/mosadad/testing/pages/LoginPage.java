@@ -1,38 +1,27 @@
 package com.mosadad.testing.pages;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import io.qameta.allure.Step;
 
-/**
- * /auth/login — locators verified live against the QA environment on
- * 2026-08-30 (Angular app; ids are stable form-control ids, not generated).
- */
 public class LoginPage extends BasePage {
 
     private static final String EMAIL_INPUT = "#email";
     private static final String PASSWORD_INPUT = "#password";
-    private static final String REMEMBER_EMAIL_CHECKBOX = "input[name='remember']";
-    private static final String FORGOT_PASSWORD_LINK = "text=Forgot Password?";
+    // Class, not text: the link text is translated when the page is in Arabic.
+    private static final String FORGOT_PASSWORD_LINK = "a.forgot-password";
     private static final String SIGN_IN_BUTTON = "button[type='submit']";
-    // ngx-toastr error toast — verified live 2026-09-01 against "Wrong Username or Password."
     private static final String ERROR_TOAST = "#toast-container .toast-error";
+    private static final String SIGN_IN_HEADER = ".login-header";
+    private static final String LANGUAGES_BUTTON = ".languages-button";
+    private static final String LANGUAGE_OPTION = ".languages-menu li";
 
     public LoginPage(Page page) {
         super(page);
     }
 
-    /**
-     * Submits the form and returns immediately — does NOT wait for the
-     * outcome, deliberately. Success and failure need different waits
-     * (dashboard content appearing vs. a toast that auto-dismisses in a
-     * few seconds), and an internal one-size-fits-all wait here previously
-     * ate into the toast's visible window before callers ever got to check
-     * it. Callers wait for what they actually expect:
-     *   - success: DashboardPage.isLoaded() already waits for its content.
-     *   - failure: isErrorToastVisible() / getErrorToastMessage() wait for the toast.
-     */
-    // Step label deliberately references only {0} (email) — password is
-    // argument {1} and must never be interpolated into a report.
+    /** Returns immediately — callers wait for the dashboard or the error toast. */
+    // Only {0} (email) in the label — never put the password in a report.
     @Step("Log in as {0}")
     public DashboardPage login(String email, String password) {
         fill(EMAIL_INPUT, email);
@@ -41,15 +30,55 @@ public class LoginPage extends BasePage {
         return new DashboardPage(page);
     }
 
-    public void clickForgotPassword() {
+    @Step("Open Forgot Password")
+    public ForgotPasswordPage clickForgotPassword() {
         click(FORGOT_PASSWORD_LINK);
+        return new ForgotPasswordPage(page);
+    }
+
+    /**
+     * optionText is the label shown in the menu: "English" or "العربية". Must
+     * be a different language from the current one: returns once the page text
+     * has changed, because translations load a moment after the click.
+     */
+    @Step("Switch language to {0}")
+    public void switchLanguage(String optionText) {
+        String headerBefore = getSignInHeader();
+        click(LANGUAGES_BUTTON);
+        locator(LANGUAGE_OPTION).filter(new Locator.FilterOptions().setHasText(optionText)).click();
+        page.waitForFunction("([selector, before]) => document.querySelector(selector)?.innerText.trim() !== before",
+                java.util.List.of(SIGN_IN_HEADER, headerBefore));
+    }
+
+    /** Reloads and waits for the app to boot; the page direction is empty until it has. */
+    @Step("Reload login page")
+    public void reload() {
+        reloadAndWaitForNetworkIdle();
+        waitVisible(SIGN_IN_HEADER);
+    }
+
+    public String getSignInHeader() {
+        return getText(SIGN_IN_HEADER);
+    }
+
+    public String getLanguagesButtonText() {
+        return getText(LANGUAGES_BUTTON);
+    }
+
+    /** "rtl" in Arabic, "ltr" in English. The app leaves the html lang attribute at "en" either way. */
+    public String getPageDirection() {
+        return (String) page.evaluate("document.documentElement.dir");
+    }
+
+    /** The app keeps the chosen language in localStorage, so it survives a reload. */
+    public String getStoredLanguage() {
+        return (String) page.evaluate("localStorage.getItem('lang')");
     }
 
     public boolean isOnLoginPage() {
         return currentUrl().contains("/auth/login");
     }
 
-    /** ngx-toastr auto-dismisses after a few seconds — waits (bounded) for it to appear rather than a single instant check. */
     public boolean isErrorToastVisible() {
         try {
             waitVisible(ERROR_TOAST);

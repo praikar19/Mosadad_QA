@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+  Fast Track end to end on stage (Union claimant → Orient at-fault), from batch
+  upload to paying the credit notes. The last step is a REAL ATB Pay payment
+  from Orient's wallet, and every run leaves a paid batch of 2 claims on shared
+  stage data, so it is kept out of the other suites. Run: mvn test -P fast-track
+-->
+<suite name="Mosadad — Fast Track E2E" verbose="1" parallel="none" thread-count="1">
+    <test name="Fast Track — Union to Orient">
+        <classes>
+            <class name="com.mosadad.testing.tests.claims.FastTrackE2ETest"/>
+        </classes>
+    </test>
+</suite>

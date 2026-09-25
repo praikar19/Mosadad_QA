@@ -6,9 +6,6 @@ import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/** claims service — ClaimTask tag. Single-endpoint tag: per-claim task list (assignment/SLA tracking). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — ClaimTask")
 public class ClaimTaskApiTest extends BaseApiTest {

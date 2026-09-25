@@ -12,3 +12,6 @@ src/test/resources/credentials.properties
 
 # macOS
 .DS_Store
+
+# Emailable Allure reports generated per run
+reports/

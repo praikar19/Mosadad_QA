@@ -10,12 +10,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * invoice service — Submittal tag. Same submission concept as
- * {@code quotation}'s Submittal tag but for invoice-stage rejected/
- * resubmitted flows — a separate implementation confirmed live, not a proxy
- * to quotation's service.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Invoice API — Submittal")
 public class SubmittalApiTest extends BaseApiTest {

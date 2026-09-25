@@ -12,15 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * inthub service — DraftAccident tag. A draft/staging accident record
- * before it's attached to a real recovery claim — see MOSADAD_DOMAIN.md
- * §Stage 1 "Police Data Entry" and "Manual Entry".
- *
- * <p>Confirmed live 2026-09-17: despite the path parameter being named
- * {@code {reportNumber}}, {@code GET /DraftAccident/{reportNumber}} actually
- * expects the draft's own Mongo id, not its human-readable police report
- * number (a real reportNumber like "223010383622111111432421" 404s; the
- * matching record's {@code id} field works).
+ * inthub service — DraftAccident. GET /DraftAccident/{reportNumber} actually
+ * expects the draft's id, not the report number.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("IntHub API — DraftAccident")

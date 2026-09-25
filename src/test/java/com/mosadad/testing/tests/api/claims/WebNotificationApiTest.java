@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — WebNotification tag. Broader web-notification feed per entity (title/content/creationDate) — distinct from InAppNotification (per-user bell inbox) and tenant's Notification (config/templates). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — WebNotification")
 public class WebNotificationApiTest extends BaseApiTest {

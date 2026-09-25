@@ -10,30 +10,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — Dashboard tag. The largest tag in the API (66
- * operations) — every widget behind the Entity, Admin and Regulator
- * dashboards (see MOSADAD_DOMAIN.md's "Verified vs Stubbed" section: Claims
- * Report, SLA Violation, and every ranking/export report reachable from
- * them). Systematically probed live 2026-09-17 (see class-level findings
- * below) rather than hand-tested one at a time — 66 endpoints share only a
- * handful of real shapes:
- *
- * <ul>
- *   <li><b>Plain reports</b> (GET with optional period/date query params,
- *       or POST with an empty filter body) — all return real 200 data.</li>
- *   <li><b>Exports</b> — POST with body {@code {"exportFormat":"Excel"|"Pdf"|"Csv"}}
- *       (confirmed live: a string enum, "xlsx" is rejected) return a real
- *       non-empty file for 26 of 29 export endpoints.</li>
- *   <li><b>Admin/Regulator financial reports</b> (4 non-export +
- *       5 export variants) require real entity/counterpart ids
- *       (EntityIds, or AtFaultIds+ClaimantId) beyond just exportFormat —
- *       validation-only here.</li>
- *   <li><b>3 confirmed backend bugs</b> (real HTTP 500, not the usual
- *       envelope) — see {@code exportAdminTasksOverdueReportThrowsServerError}
- *       and siblings below.</li>
- * </ul>
- */
+/** claims service — Dashboard reports and exports. Three exports have known backend 500s (see below). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Dashboard")
 public class DashboardApiTest extends BaseApiTest {
@@ -49,8 +26,6 @@ public class DashboardApiTest extends BaseApiTest {
         ApiAssertions.assertStatusCode(res, 200, "HTTP status");
         assertThat(res.asByteArray().length).isGreaterThan(0);
     }
-
-    /* ── Plain GET reports ─────────────────────────────────────────────── */
 
     @Test(groups = {"api", "claims", "dashboard"})
     @Severity(SeverityLevel.CRITICAL)
@@ -105,8 +80,6 @@ public class DashboardApiTest extends BaseApiTest {
     @Severity(SeverityLevel.MINOR)
     @Description("GET /Dashboard/RecoverablePayableValues/{entityId} for the logged-in entity returns 200.")
     public void getRecoverablePayableValuesForOwnEntityReturns200() { assertReportOk(claims().get("/Dashboard/RecoverablePayableValues/" + entityId())); }
-
-    /* ── Plain POST reports (empty filter body) ──────────────────────────── */
 
     @Test(groups = {"api", "claims", "dashboard"})
     @Severity(SeverityLevel.NORMAL)
@@ -223,8 +196,6 @@ public class DashboardApiTest extends BaseApiTest {
     @Description("POST /Dashboard/RegulatorRecoveryClaimCycle with an empty body returns 200 with real recovery-claim-cycle data for the Regulator view.")
     public void getRegulatorRecoveryClaimCycleReturns200() { assertReportOk(claims().body(Map.of()).post("/Dashboard/RegulatorRecoveryClaimCycle")); }
 
-    /* ── Admin/Regulator financial reports needing real entity ids — validation-only ── */
-
     @Test(groups = {"api", "claims", "dashboard"})
     @Severity(SeverityLevel.NORMAL)
     @Description("POST /Dashboard/Admin/FinancialReport with an empty body fails model validation (HTTP 400): AtFaultIds and ClaimantId are required.")
@@ -260,8 +231,6 @@ public class DashboardApiTest extends BaseApiTest {
         ApiAssertions.assertStatusCode(res, 400, "HTTP status");
         assertThat(res.jsonPath().getMap("errors")).containsKey("EntityIds");
     }
-
-    /* ── Exports: {"exportFormat":"Excel"} returns a real file ──────────── */
 
     @Test(groups = {"api", "claims", "dashboard", "export"})
     @Severity(SeverityLevel.NORMAL)
@@ -388,8 +357,6 @@ public class DashboardApiTest extends BaseApiTest {
     @Description("POST /Dashboard/MyClaims/Export with exportFormat:Excel returns a real, non-empty file.")
     public void exportMyClaimsReturnsFile() { assertExportOk(claims().body(EXCEL).post("/Dashboard/MyClaims/Export")); }
 
-    /* ── Export endpoints needing more than exportFormat — validation-only ── */
-
     @Test(groups = {"api", "claims", "dashboard", "export"})
     @Severity(SeverityLevel.NORMAL)
     @Description("POST /Dashboard/Admin/FinancialReport/Export with only exportFormat still fails model validation (HTTP 400): AtFaultIds and ClaimantId are also required.")
@@ -435,7 +402,7 @@ public class DashboardApiTest extends BaseApiTest {
         assertThat(res.asString()).containsIgnoringCase("Payable is required");
     }
 
-    /* ── Confirmed backend bugs: real HTTP 500 with a raw string error body ── */
+    // Known backend bugs: HTTP 500 with a raw string body.
 
     @Test(groups = {"api", "claims", "dashboard", "export", "bug"})
     @Severity(SeverityLevel.NORMAL)

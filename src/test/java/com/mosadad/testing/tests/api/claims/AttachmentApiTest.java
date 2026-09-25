@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — Attachment tag. Supporting-document uploads across every claim stage (see MOSADAD_DOMAIN.md — every stage lists "supporting documents"). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Attachment")
 public class AttachmentApiTest extends BaseApiTest {

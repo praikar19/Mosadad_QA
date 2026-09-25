@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** tenant service — PermissionCategory tag. Groups PermissionGroups (which in turn group Permissions) under a module, e.g. "Admin" under the Recovery Claims module. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — PermissionCategory")
 public class PermissionCategoryApiTest extends BaseApiTest {

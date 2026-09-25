@@ -11,14 +11,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * tenant service — Entity tag. An "Entity" is one of the 38 insurers
- * registered on Mosadad (see MOSADAD_DOMAIN.md §Actors). GET/List reads
- * verified live 2026-09-17. Create/Update/Delete/Activation are real
- * mutations against the shared QA tenant list — the "happy path" for those
- * stays a disabled stub (enabled=false) pending explicit sign-off to
- * actually create/disable/delete entities in the shared environment;
- * their required-field validation IS exercised live below, since sending
- * a deliberately empty body never persists anything.
+ * tenant service — Entity (registered insurers). Create/Update/Delete/Activation
+ * mutate the shared tenant list, so their happy paths are disabled stubs.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Entity")

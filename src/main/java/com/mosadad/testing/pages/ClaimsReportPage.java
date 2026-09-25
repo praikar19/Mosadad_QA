@@ -3,12 +3,7 @@ package com.mosadad.testing.pages;
 import com.mosadad.testing.constants.Routes;
 import com.microsoft.playwright.Page;
 
-/**
- * /entity-portal/financial-statement-report — Dashboard module, reached via
- * RecoveryClaimsHubPage.openClaimsReport(). URL verified live 2026-08-30
- * (RecoveryClaimsNavigationTest); page content itself not yet explored —
- * only isLoaded() is backed by anything real so far.
- */
+/** /entity-portal/financial-statement-report — only isLoaded() is verified. */
 public class ClaimsReportPage extends BasePage {
 
     public ClaimsReportPage(Page page) {

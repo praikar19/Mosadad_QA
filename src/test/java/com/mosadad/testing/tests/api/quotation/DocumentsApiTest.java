@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** quotation service — Documents tag. Serves uploaded supporting-document content by a signed token (workshop estimates, repair amounts — see MOSADAD_DOMAIN.md §Stage 2A). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Quotation API — Documents")
 public class DocumentsApiTest extends BaseApiTest {

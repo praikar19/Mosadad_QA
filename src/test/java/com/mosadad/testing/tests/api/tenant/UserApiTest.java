@@ -12,11 +12,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * tenant service — User tag. Login and RefreshToken (also under this tag in
- * Swagger) are covered in {@code AuthApiTest} instead, since they're
- * cross-cutting auth concerns exercised by every other test class.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — User")
 public class UserApiTest extends BaseApiTest {

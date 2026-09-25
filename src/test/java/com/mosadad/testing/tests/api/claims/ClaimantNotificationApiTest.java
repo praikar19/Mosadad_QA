@@ -11,16 +11,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * claims service — ClaimantNotification tag. Outbound notifications to the
- * claimant side of a claim.
- *
- * <p><b>Caution — {@code POST /ClaimantNotification/TriggerAll} is another
- * unscoped, platform-wide bulk action</b> in the same family as
- * {@code QuotationApiTest}'s {@code AcceptAll}: confirmed live it returns
- * {@code "All notification jobs triggered successfully."} and, unlike the
- * Accept-family endpoints, this one has no id-scoped safe sibling at all —
- * every call triggers every pending notification job platform-wide. It is
- * never called by this suite, not even for a validation probe.
+ * claims service — ClaimantNotification. WARNING: POST /ClaimantNotification/TriggerAll
+ * fires every pending notification platform-wide — never call it.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — ClaimantNotification")

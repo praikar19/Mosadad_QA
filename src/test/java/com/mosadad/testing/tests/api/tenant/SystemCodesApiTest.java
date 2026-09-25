@@ -8,14 +8,7 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * tenant service — SystemCodes tag. A generic lookup-list endpoint keyed by
- * a "master code" (e.g. EMIRATE, COUNTRY, GENDER). Confirmed live
- * 2026-09-17: every master code tried on this QA tenant returns HTTP 200
- * with an empty list rather than 404/validation error — the endpoint
- * doesn't reject unknown codes, it just returns nothing for them, so the
- * assertion here is intentionally structural (a list, not its contents).
- */
+/** tenant service — SystemCodes. Unknown codes return an empty list, so assertions are structural. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — SystemCodes")
 public class SystemCodesApiTest extends BaseApiTest {

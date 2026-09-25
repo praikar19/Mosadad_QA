@@ -11,27 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Reusable two-actor browser session, for any test where a claimant insurer
- * and an at-fault insurer need to be logged in at the same time (claim
- * submitted by one, seen/acted on by the other — see MOSADAD_DOMAIN.md).
- *
- * Same ThreadLocal pattern as {@link PlaywrightManager}, but holds two
- * independent sessions instead of one: PlaywrightManager is right for every
- * single-actor test in this suite, this is for the two-actor case.
- *
- * Deliberately two different browser engines (real Chrome for the claimant,
- * Playwright's WebKit — the engine Safari is built on — for the at-fault
- * insurer) rather than two contexts on the same engine, so the two sessions
- * are as independent as two different users on two different machines would
- * be. Playwright cannot drive the real Safari.app (that needs Apple's own
- * safaridriver, a different tool); WebKit is the standard stand-in.
- *
- * Usage:
- *   ActorPages pages = TwoActorPlaywrightManager.openTwoBrowsers();   // @BeforeMethod
- *   ... pages.getClaimantPage() / pages.getAtFaultPage() ...
- *   TwoActorPlaywrightManager.closeTwoBrowsers(tracePathPrefix);      // @AfterMethod
+ * Two concurrent sessions (claimant + at-fault insurer), deliberately on
+ * different engines (Chrome and WebKit) so they stay fully independent.
  */
 public final class TwoActorPlaywrightManager {
 
@@ -69,15 +55,23 @@ public final class TwoActorPlaywrightManager {
         return new ActorPages(claimantPage, atFaultPage);
     }
 
-    /**
-     * Resolves a browser name to the right BrowserType (+ channel where
-     * needed) — same mapping PlaywrightManager uses for the single-actor
-     * case. "safari" and "webkit" both mean Playwright's WebKit engine:
-     * there is no such thing as a "safari" channel on Chromium, since
-     * Safari isn't Chromium-based — Chromium.launch().setChannel("safari")
-     * fails at launch with "Unsupported chromium channel". Only "chrome"
-     * and "edge" are real Chromium channels.
-     */
+    /** Each actor's open pages on this thread, labelled "claimant" / "at-fault"; empty if no session is open. */
+    public static Map<String, Page> getOpenPages() {
+        Map<String, Page> pages = new LinkedHashMap<>();
+        addLastPage(pages, "claimant", CLAIMANT_CONTEXT.get());
+        addLastPage(pages, "at-fault", AT_FAULT_CONTEXT.get());
+        return pages;
+    }
+
+    private static void addLastPage(Map<String, Page> pages, String actor, BrowserContext context) {
+        if (context == null) return;
+        List<Page> open = context.pages();
+        if (!open.isEmpty()) {
+            pages.put(actor, open.get(open.size() - 1));
+        }
+    }
+
+    /** "safari"/"webkit" mean the WebKit engine — Chromium has no "safari" channel. */
     private static Browser launchBrowser(Playwright playwright, String browserName) {
         BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
                 .setHeadless(ConfigManager.isHeadless());
@@ -91,7 +85,6 @@ public final class TwoActorPlaywrightManager {
         };
     }
 
-    /** Stops tracing (saving to "<tracePathPrefix>-claimant.zip" / "-atFault.zip"), closes both sessions, clears the ThreadLocals. */
     public static void closeTwoBrowsers(String tracePathPrefix) {
         try {
             BrowserContext claimantContext = CLAIMANT_CONTEXT.get();

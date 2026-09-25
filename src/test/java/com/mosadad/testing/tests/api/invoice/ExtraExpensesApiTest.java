@@ -12,20 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * invoice service — ExtraExpenses tag. Ad-hoc expense line items attached
- * to a claim's invoice (towing, storage, etc.), each independently
- * negotiable between insurers.
- *
- * <p><b>Caution — {@code PUT /ExtraExpenses/HandleStatus} and
- * {@code PUT /ExtraExpenses/AcceptNegotiation} (both WITHOUT an id) are the
- * same dangerous unscoped-bulk pattern as
- * {@code QuotationApiTest}'s {@code AcceptAll}</b> — confirmed live an empty
- * body on either returns {@code "Accepted Successfully":true} rather than a
- * validation error. Their id-scoped siblings
- * ({@code PUT /ExtraExpenses/HandleStatus/{id}},
- * {@code POST /ExtraExpenses/{id}/AcceptNegotiation}) are safe and used
- * below instead. The two unscoped variants are never called by this suite,
- * not even for validation.
+ * invoice service — ExtraExpenses. WARNING: PUT /ExtraExpenses/HandleStatus and
+ * /AcceptNegotiation without an id perform a real bulk accept — never call them.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Invoice API — ExtraExpenses")

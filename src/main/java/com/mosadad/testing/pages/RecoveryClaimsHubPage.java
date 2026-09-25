@@ -2,20 +2,8 @@ package com.mosadad.testing.pages;
 
 import com.mosadad.testing.constants.Routes;
 import com.microsoft.playwright.Page;
-import com.mosadad.testing.pages.claims.PotentialRecoveryClaimsListPage;
 import io.qameta.allure.Step;
 
-/**
- * /entity-landing/recovery-claims — verified live 2026-08-30. Three module
- * cards, each containing real nav-link anchors (hrefs captured via DOM
- * inspection, not guessed):
- *
- *   Dashboard              -> Claims Report ({@link Routes#CLAIMS_REPORT}),
- *                              SLA Violation ({@link Routes#SLA_VIOLATION})
- *   Recovery Claim Records -> Potential Recovery Claims, Recovery Claims List,
- *                              Fast Track
- *   Financial               -> Bulk Settlement, Due Amount, Payment History
- */
 public class RecoveryClaimsHubPage extends BasePage {
 
     private static final String NAV_LINK = "a.nav-link";
@@ -28,7 +16,6 @@ public class RecoveryClaimsHubPage extends BasePage {
         return currentUrl().contains(Routes.RECOVERY_CLAIMS_HUB);
     }
 
-    /** Clicks a module link by its exact visible text, e.g. "Recovery Claims List", and waits for the SPA route change. */
     @Step("Open '{0}' module")
     private void openModuleLink(String linkText) {
         page.locator(NAV_LINK, new Page.LocatorOptions().setHasText(linkText)).click();
@@ -46,9 +33,8 @@ public class RecoveryClaimsHubPage extends BasePage {
         return new SlaViolationPage(page);
     }
 
-    public PotentialRecoveryClaimsListPage openPotentialRecoveryClaimsListPage() {
+    public void openPotentialRecoveryClaims() {
         openModuleLink("Potential Recovery Claims");
-        return new PotentialRecoveryClaimsListPage(page);
     }
 
     public RecoveryClaimsListPage openRecoveryClaimsList() {

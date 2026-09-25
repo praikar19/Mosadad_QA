@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** inthub service — Workshop tag. Repair workshops used in Quotation → Normal Repair (see MOSADAD_DOMAIN.md §Stage 2A). Note the real path is the service root {@code POST /List}, not {@code /Workshop/List} — confirmed against the live Swagger spec. */
+/** inthub service — Workshop. The real path is the service root POST /List, not /Workshop/List. */
 @Epic("Mosadad Recovery Claim")
 @Feature("IntHub API — Workshop")
 public class WorkshopApiTest extends BaseApiTest {

@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** inthub service — Health tag. Public liveness probe, same contract as the other 5 services' Health endpoints. */
 @Epic("Mosadad Recovery Claim")
 @Feature("IntHub API — Health")
 public class HealthApiTest extends BaseApiTest {

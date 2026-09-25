@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** invoice service — Documents tag. Same token-signed content-serving contract as quotation/settlement's Documents tags (invoice attachments — see MOSADAD_DOMAIN.md §Stage 3), confirmed live independently. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Invoice API — Documents")
 public class DocumentsApiTest extends BaseApiTest {

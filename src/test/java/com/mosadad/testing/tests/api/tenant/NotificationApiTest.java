@@ -10,7 +10,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** tenant service — Notification tag. Notification templates/config, not to be confused with claims/InAppNotification or claims/WebNotification (per-user inbox), which live in the claims service. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Notification")
 public class NotificationApiTest extends BaseApiTest {

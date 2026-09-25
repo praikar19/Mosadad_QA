@@ -257,8 +257,7 @@ com.mosadad.testing
 ├── api/                    ← REAL backend clients (main/, so both UI and API tests can use them)
 │   ├── ApiClient            One client, all 6 services, cached login
 │   ├── ApiAssertions        Shared assertion helpers for the 3 response shapes
-│   ├── EncryptionUtil       Login field obfuscation (XOR + SHA-256)
-│   └── WalletApiClient      A *different* third-party system (ATB Pay) — not Mosadad's own backend
+│   └── EncryptionUtil       Login field obfuscation (XOR + SHA-256)
 │
 ├── browser/                ← Playwright session management
 │   ├── PlaywrightManager     ThreadLocal<Playwright/Browser/Context/Page>
@@ -270,8 +269,7 @@ com.mosadad.testing
 │   └── ConfigManager         Central settings reader — see §2.6
 │
 ├── constants/
-│   ├── Routes                 Verified front-end URL paths
-│   └── TestDataConstants      Roles, SLA hours, claim methods
+│   └── Routes                 Verified front-end URL paths
 │
 ├── listeners/
 │   └── TestListener           TestNG hook — logs pass/fail, screenshots UI failures
@@ -279,10 +277,11 @@ com.mosadad.testing
 ├── pages/                  ← Page Objects (UI layer only)
 │   ├── BasePage                fill/click/getText/isVisible/waitVisible
 │   ├── LoginPage, DashboardPage, ...
-│   └── claims/                 Per-claim-stage page objects
+│   └── claims/                 Fast Track page objects
 │
 └── utils/
-    ├── ExcelUtils, RandomUniqueGenerator, ScreenshotUtils, CommonMethods
+    ├── ExcelUtils, ScreenshotUtils
+    └── FastTrackTestDataGenerator, FastTrackRunClaims (this run's claims + batch codes)
 ```
 
 ```
@@ -296,8 +295,7 @@ test/java/com.mosadad.testing
 │
 └── tests/
     ├── auth/, navigation/, utils/   ← single-actor UI tests
-    ├── claims/                      ← two-actor UI tests + ClaimLifecycleFixtures
-    │                                  (shared setup for Quotation/Invoice/SettlementTest — see §2.7)
+    ├── claims/                      ← two-actor UI test: FastTrackE2ETest
     │
     └── api/                                         ← API tests — see §2.5
         ├── AuthApiTest                                 cross-cutting login/security tests
@@ -346,8 +344,7 @@ classDiagram
     BaseTest <|-- BaseApiTest
     BaseUiTest <|-- LoginUiTest
     BaseUiTest <|-- RecoveryClaimsNavigationTest
-    BaseTwoActorUiTest <|-- WalletTest
-    BaseTwoActorUiTest <|-- QuotationTest
+    BaseTwoActorUiTest <|-- FastTrackE2ETest
     BaseApiTest <|-- AuthApiTest
     BaseApiTest <|-- EntityApiTest
     BaseApiTest <|-- ClaimApiTest
@@ -507,8 +504,8 @@ flowchart TD
 ```
 
 This is the same discipline the UI layer already used before this API work
-started (`CreateManualRecoveryClaimTest` etc. were already "real test,
-disabled until verified" — see Part 3 below). The API layer just applies
+started (UI tests that write shared data stay disabled or in their own
+suite until verified — see Part 3 below). The API layer just applies
 it at much larger scale: 338 live, 73 stubs.
 
 **A sharper rule inside that: some endpoints have no safe way to probe at
@@ -675,12 +672,7 @@ BaseTest                  (apiClient)
   │     └── RecoveryClaimsNavigationTest   — REAL, verified
   │
   ├── BaseTwoActorUiTest     (extends BaseTest + two concurrent Playwright sessions — claimant + at-fault)
-  │     ├── WalletTest                     — REAL, verified
-  │     ├── CreateManualRecoveryClaimTest  — real flow, stub (enabled=false, uses the old pre-2026-09-07 gate screen — see ClaimLifecycleFixtures' Javadoc)
-  │     ├── QuotationTest                  — one real method recovered (stub, enabled=false); rest still stub
-  │     ├── InvoiceTest                    — one real method recovered (stub, enabled=false); rest still stub
-  │     ├── SettlementTest                 — one real method recovered (stub, enabled=false — ends in a real ATB Pay payment, see its class Javadoc before enabling); rest still stub
-  │     └── DisputeTest                    — stub
+  │     └── FastTrackE2ETest               — REAL, stage only, own suite (mvn test -P fast-track) — pays for real, creates real data
   │
   └── BaseApiTest            (extends BaseTest — API only, no browser)
         ├── AuthApiTest                    — REAL, verified (tenant/User/Login)
@@ -691,15 +683,6 @@ BaseTest                  (apiClient)
         ├── tests/api/invoice/*Test        — REAL, verified (4 classes)
         └── tests/api/claims/*Test         — REAL, verified (20 classes)
 ```
-
-`QuotationTest`, `InvoiceTest`, and `SettlementTest`'s real methods share their
-setup through `tests/claims/ClaimLifecycleFixtures` (package-private, not a
-`@Test` class itself) — each stage's fixture method takes the previous
-stage's result and returns its own, since Stage 2 needs an accepted claim,
-Stage 3 needs an accepted quotation, and Stage 4 needs an accepted invoice.
-See that class's Javadoc for the full provenance: it was recovered from an
-original one-method, six-stage two-actor E2E draft and split to match how
-the rest of this suite is organized, one stage per class.
 
 API-only tests run without a browser at all (`mvn test -P api`), same role
 as `LoginTest` in the sibling mobile framework — the fast, no-browser PR
@@ -718,6 +701,17 @@ the Claimant Insurer role (`Dubaiqa@gmail.com`):
 - `LoginPage` — `#email`, `#password`, `button[type=submit]` ("Sign In"),
   `input[name=remember]`, "Forgot Password?" link. Real Angular form ids,
   not generated/obfuscated.
+- Login page language switcher and Forgot Password, re-checked 2026-09-24 and
+  covered by `LoginLanguageUiTest` / `ForgotPasswordUiTest`:
+  - Language: `.languages-button` opens `.languages-menu li` ("English",
+    "العربية"). Arabic sets `html[dir=rtl]` and stores `lang=ar` in
+    localStorage, so it survives a reload. The html `lang` attribute stays
+    "en" in both languages.
+  - Forgot Password: `a.forgot-password` goes to `/auth/forget-password`
+    (`ForgotPasswordPage`), with `.forget-header`, `#email` and
+    `button[type=submit]`. Submit is disabled until the email is valid, and
+    a bad format shows `.text-danger` "Invalid email format." The tests never
+    click Submit, because it sends a real reset email.
 - `DashboardPage` — lands at `/entity-landing/dashboard`; sidebar
   (Home / Recovery Claims / Company Details), top bar
   (`.search-input`, `.bell-button`, `.profile-trigger`), "My Wallets"
@@ -729,13 +723,10 @@ the Claimant Insurer role (`Dubaiqa@gmail.com`):
 **Not yet explored — TODO placeholders in the code**, marked with `TODO`
 comments in every affected class:
 
-- The actual "Create Claim" flow (Manual Entry / Police Data Entry / Fast
-  Track) beyond the Manual Entry path already built in
-  `pages/claims/CreateManualClaimPage.java` /
-  `CreateManualRecoveryClaimPage.java` (live-verified, but its test is
-  disabled pending a second role's credentials — see `CreateManualRecoveryClaimTest`).
-- Quotation, Total Loss, Salvage screens — `pages/claims/QuotationPage.java`.
-- Invoice, Settlement, Dispute, Wallet-detail screens.
+- The Manual Entry and Police Data Entry "Create Claim" flows (Fast Track is
+  covered by `FastTrackE2ETest`).
+- Quotation, Total Loss, Salvage, Invoice, Settlement, Dispute and
+  Wallet-detail screens for manually created claims.
 
 Do not assume a `TODO`-marked UI selector works. Verify against the real
 app before enabling its test.
@@ -748,6 +739,46 @@ History); the actual "Create Claim" flow and all three entry methods, the
 Quotation/Total Loss/Salvage screens, Invoice, Settlement, Dispute, Wallet
 detail, and any At-Fault Insurer / Regulator / Mosadad Admin screens remain
 unexplored in the UI (no credentials for those roles yet).
+
+### Fast Track end to end — `FastTrackE2ETest` (stage, Union → Orient)
+
+Runs the manual Fast Track flow from batch upload to "Credit Note Created" on
+both sides, then pays the credit notes: Recovery Claims → Due Amount → Settle
+(Union) → tick only this run's claims → Proceed To Payment → ATB checkout →
+I agree → Confirm. **The last step is a REAL payment from Orient's ATB wallet,
+and every run leaves a paid batch of 2 claims on shared stage data**, so it
+belongs to no other suite: `mvn test -P fast-track`. The Smart Loader setup
+step is left out because it deletes the existing mapping.
+
+Verified live on stage 2026-09-24:
+
+| Screen | What was verified |
+|---|---|
+| Create New Batch | Union's upload columns are the "Download Template" set: `Claim No.`, `Accident no`, `Accident date`, `Plate claimant`, `Atfault_plate_number`, `Recovery_claim_amount` (e.g. `4,100 AED`). The old 12-column layout is rejected. Faulty Entity option: `ORIENT INSURANCE PJSC`. A rejected sheet leaves the page with an `Error:` list and a "Download error file" button |
+| Fast Track Claims (batch) | Columns Serial Number · Claim Number · Approved Claim Amount · Accident Report · Invoice · Status. New claims read `Pending 1 Document(s)`. Claimant sees a `Submit to At-Fault` button |
+| Claim details | Claim Summary shows `Batch Code` (e.g. `RC-2026-000019`) and the sheet values (`Claimant Claim Number`, `Report Number`, `Report Date`, `Plate Number`, `Atfault Plate Number`, `Claim Amount`). The first `input[type=file]` is "Upload Recovery Document". There is a `Save` button |
+| At-fault Fast Track list | The batches are under the `Payable Claims` tab (a plain span). Orient sees Union as `Union Insurance Company`. The row ⋮ is a Bootstrap `button.dropdown-toggle`. Its menu shows `Download Sheet` on a submitted batch |
+| At-fault batch | `Proceed to Settlement` button. The Claim Number column reads `-` until the at-fault's numbers are re-uploaded |
+| Download Sheet | Calls `GET claims/FastTrack/AtFaultTemplate/{batchId}`, which returns 400 "No submitted claims found for this batch." when there are none |
+| Save (claim details) | Uploads the attached files via `POST claims/FastTrack/ItemDocuments/{claimId}`. Navigating away before it answers cancels the upload silently, so `clickSave()` waits for that response |
+| Submit to At-Fault | Opens `app-batch-popup dialog.popup-container` (a native `<dialog>`, not a Material/Bootstrap modal): "Batch Summary", `N Complete Claims` / `N Incomplete Claims`, the "this batch will be locked" warning, and `Cancel` / `Submit To At-Fault` buttons. After confirming, the same dialog stays open showing "Batch Submitted Successfully!" / "RC-… Has Been Sent To ORIENT INSURANCE PJSC For Review. The Batch Is Now Locked." and a `Back To Fast Track` button; claim rows then read `Submitted` with serial numbers like `RC-2026-046300` |
+
+| Bulk Settlement (at-fault) | One row per counterpart entity; totals include older accepted claims. From the app's code: `Settle` is enabled when `totalPayable > 0`, `Request Settlement` when `totalReceivable > 0` (toast "Settlement request has been sent successfully."), so the at-fault normally only gets Settle |
+| Bulk Settlement Payment | Loads its list once, selects nothing by itself, ticks persist (checked live); the "Number Of Claims Selected" / "Total Amount" panel updates a moment after each tick. `Issue Credit Note` → toast "Credit Note issued successfully." → back to Bulk Settlement. Claims then read `Credit Note Created` on both sides |
+| Due Amount → Credit Note Bulk Details | Due Amount: one row per entity with `Settle` → `credit-note-bulk`, same table behaviour. A claim whose checkout was started is disabled for 24h (`PaymentPending`, info icon: "Payment is Pending. Please wait for 24 hours."), confirmed or not. `Proceed To Payment` → `/callback` ("Redirecting..."; a UAE PASS link is built but not used on stage) → ATB checkout, or `payment-failure` |
+| ATB checkout (`rak.atbpay.me`) | Account and balance, Invoice Details per payee plus Mosadad fees, "I agree to Terms&Conditions", `Confirm`, `Cancel Process`. Confirm returns to `/entity-portal/payment-status`, which forwards to `payment-success?transactionId=…` or `payment-failure` |
+| Payment Success | Heading "Payment Was Successful", the transaction ID, and `Return To Home Screen`. **That button calls `confirmPayment` for each paid claim** before going to Recovery Claims, so the claims only reach `Payment Successful` once it is clicked |
+| List search ("Accident Number or Plate Number") | Batch list (both tabs): matches the **batch code**, server-side as you type (`FastTrack/List` `smartSearch`); not accident no. or plate. Inside a batch: matches the **claimant claim number** only, filtered in the browser. Used instead of paging, since lists are oldest-first, 10 per page |
+| Download Sheet (submitted batch) | Works: the file has an `At Fault Claim Number` column |
+| ⋮ → Upload Excel | **Blocked on stage.** The front end shows it on the Payable tab only when the batch `status == 2` (ClaimantUploadAttachment) and the user has `update:claims`. Orient has the permission, but `FastTrack/List` returns `status: 5` for submitted batches (RC-2026-000023/24), so only "Download Sheet" appears. Looks like a front-end/back-end status mismatch; raise it with the devs. Until it's fixed, `FastTrackE2ETest` flags it as a **broken step in Allure** (plus a log warning) and falls back to the per-claim flow below |
+| At-fault claim details (fallback) | "+ Add Claim Number" opens "Add At Fault Claim and Chassis Number" (placeholder `Enter At-Fault Claim Number`, required; chassis optional). Submit, then a `Save` button appears in the Claim Summary (flow from manual screenshots; the Save request and opening a claim from the at-fault batch list are not yet verified by the test) |
+
+**Not yet verified:** `Upload Excel` and
+the "Update And Re-upload Batch" screen, the downloaded sheet's
+`At Fault Claim Number` header, the Invoice Accepted / Credit Note Created
+status text, and Bulk Settlement's `Request Settlement` button and toast.
+These come from the manual test steps and are marked in each page object's
+Javadoc. Re-check them on the first run.
 
 ### API layer — verified live 2026-09-17 (all 6 backend microservices)
 
@@ -837,16 +868,14 @@ src/
 │   ├── api/
 │   │   ├── ApiClient.java          RestAssured wrapper — REAL, all 6 services, verified live
 │   │   ├── ApiAssertions.java      The 3 real response shapes (envelope/ProblemDetails/401) + helpers
-│   │   ├── EncryptionUtil.java     Reverse-engineered XOR+SHA-256 login field obfuscation
-│   │   └── WalletApiClient.java    Third-party ATB Pay wallet portal client (separate system)
+│   │   └── EncryptionUtil.java     Reverse-engineered XOR+SHA-256 login field obfuscation
 │   ├── browser/
 │   │   ├── PlaywrightManager.java  ThreadLocal<Playwright/Browser/Context/Page>
 │   │   └── AuthStateCache.java     JVM-wide cached storageState login — see §3.5 above
 │   ├── config/
 │   │   └── ConfigManager.java      Reads config.properties + credentials.properties; -D overrides
 │   ├── constants/
-│   │   ├── Routes.java             Verified front-end route paths
-│   │   └── TestDataConstants.java  Roles, SLA hours, claim methods, etc.
+│   │   └── Routes.java             Verified front-end route paths
 │   ├── listeners/
 │   │   └── TestListener.java       TestNG ITestListener — logs + screenshot on fail
 │   ├── pages/
@@ -854,7 +883,7 @@ src/
 │   │   ├── LoginPage.java          REAL — verified
 │   │   ├── DashboardPage.java      REAL — verified
 │   │   ├── RecoveryClaimsHubPage.java  REAL — verified
-│   │   └── claims/                 STUB page objects — Stage 1-4, Dispute, Wallet
+│   │   └── claims/                 Fast Track page objects
 │   └── utils/
 │       └── ScreenshotUtils.java    Captures + attaches to Allure on failure
 │
@@ -867,7 +896,7 @@ src/
     │   └── tests/
     │       ├── auth/LoginUiTest                     REAL — 2 tests
     │       ├── navigation/RecoveryClaimsNavigationTest  REAL — 8 tests
-    │       ├── claims/*Test                          STUB — UI checklist, enabled=false
+    │       ├── claims/FastTrackE2ETest               REAL — stage, own suite (creates real data)
     │       └── api/
     │           ├── AuthApiTest                       REAL — 6 tests
     │           ├── tenant/    (10 classes, 66 tests)  REAL
@@ -900,6 +929,9 @@ mvn test -P smoke
 
 # API — 411 tests across all 6 backend microservices, 338 live-verified
 mvn test -P api
+
+# Fast Track end to end on stage — creates real data and makes a REAL payment; run on purpose only
+mvn test -P fast-track
 
 # Override any config value at runtime (e.g. different browser, different QA login)
 mvn test -P smoke -Dbrowser=firefox -Dqa.claimant.email=... -Dqa.claimant.password=...
@@ -1007,24 +1039,11 @@ you need to change retention or add a new logger.
 
 ## 4.4 Next Steps (in priority order)
 
-1. A second role's (At-Fault Insurer) test credential already exists
-   (`stage.claimant.email/password.dnl`) and is what
-   `CreateManualRecoveryClaimTest`, `QuotationTest`, `InvoiceTest`, and
-   `SettlementTest`'s real-but-disabled methods all log in as — it hasn't
-   been re-confirmed live in this pass, though. Before enabling any of
-   them: re-verify that login still works, then re-verify each stage
-   against the real app (the claim-creation step in particular changed
-   live on 2026-09-07 — see `ClaimLifecycleFixtures`' Javadoc — so
-   `CreateManualRecoveryClaimTest` specifically may now be exercising a
-   screen that no longer exists). `SettlementTest`'s method ends in a
-   real ATB Pay payment — see its class Javadoc and CLAUDE.md's
-   risk-level guidance before enabling it. Police Data Entry and Fast
-   Track bulk upload still need to be walked and wired up separately —
-   neither was covered by the recovered draft.
+1. Get the "Upload Excel" status mismatch fixed on stage (see the Fast Track
+   table above), then let `FastTrackE2ETest` take the re-upload path again.
 2. Get Regulator and Mosadad Admin test credentials for SLA-violation and
    dispute-history visibility tests, and governance/access-management
-   tests — `DisputeTest` is still a pure stub, not covered by anything
-   recovered here.
+   tests.
 3. Get sign-off to enable the 73 disabled API mutation stubs against
    disposable QA fixtures (a throwaway entity/claim/role per write-heavy
    test class) — see each `*ApiTest` class's `enabled=false` methods and

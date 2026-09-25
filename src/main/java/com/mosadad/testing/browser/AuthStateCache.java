@@ -15,27 +15,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Caches a real, logged-in Playwright storage state (cookies + localStorage
- * — wherever the app's own session actually lives; storageState captures
- * both, so it doesn't matter which) per platform+user, JVM-wide. Same idea
- * as {@code ApiClient}'s cached access token: one real login for the whole
- * suite run instead of one per test method.
- *
- * A UI test that just needs to *be* logged in (not test the login form
- * itself) calls {@link #ensureLoggedIn(String, String)} and hands the
- * result to {@link PlaywrightManager#reopenWithStorageState(String)}
- * instead of driving LoginPage's real form on every @Test method — see
- * BaseUiTest.loginWithCachedSession(). LoginUiTest itself deliberately
- * doesn't use this: it's the one test that has to exercise the real login
- * form.
- *
- * In-memory only, never written to disk — the cache lives exactly as long
- * as this JVM run (one {@code mvn test}), so a stale/expired token from a
- * previous run can never leak into this one. The tradeoff is the one
- * bootstrap login below always happens at least once per key per run; that
- * cost is unavoidable (something has to prove the credentials are valid)
- * and it's exactly what PlaywrightManager would have paid anyway for a
- * single test.
+ * Caches a logged-in Playwright storageState per platform+user for the JVM,
+ * so UI tests skip the login form (see BaseUiTest.loginWithCachedSession()).
+ * In memory only.
  */
 public final class AuthStateCache {
 
@@ -45,19 +27,6 @@ public final class AuthStateCache {
 
     private AuthStateCache() {}
 
-    /**
-     * Returns a Playwright storageState JSON string for platform+userKey
-     * (e.g. {@code ensureLoggedIn("qa", "dubai")} for the credentials at
-     * {@code qa.claimant.email.dubai} / {@code qa.claimant.password.dubai}
-     * in credentials.properties), logging in for real exactly once per key
-     * per JVM run — double-checked locking, same pattern as
-     * {@code ApiClient.ensureAuthenticated()}. Every later call for the
-     * same key returns the cached value immediately, no browser involved.
-     *
-     * The bootstrap login runs in its own throwaway, always-headless
-     * browser (nobody needs to watch a one-off login happen), independent
-     * of whatever browser/headless setting the calling test itself uses.
-     */
     public static String ensureLoggedIn(String platform, String userKey) {
         String key = platform + ":" + userKey;
         String cached = CACHE.get(key);
@@ -98,7 +67,6 @@ public final class AuthStateCache {
         }
     }
 
-    /** Drops every cached session, e.g. after a test that intentionally logs out or invalidates its token. */
     public static void clear() {
         CACHE.clear();
     }

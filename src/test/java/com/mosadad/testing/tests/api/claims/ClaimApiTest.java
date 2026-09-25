@@ -11,20 +11,12 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — Claim tag. The core recovery-claim entity driving the
- * whole lifecycle in MOSADAD_DOMAIN.md (Stage 1 registration through
- * Stage 4 settlement, plus disputes, reassignment, and cross-insurer
- * reallocation). The largest single tag in the API (35 operations).
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Claim")
 public class ClaimApiTest extends BaseApiTest {
 
     private static final String REAL_CLAIM_ID = "6aab489ecb32564549128fa6";
     private static final String FAKE_ID = "000000000000000000000000";
-
-    /* ── Reads ─────────────────────────────────────────────────────────── */
 
     @Test(groups = {"api", "claims", "claim"})
     @Severity(SeverityLevel.BLOCKER)
@@ -202,8 +194,6 @@ public class ClaimApiTest extends BaseApiTest {
         assertThat(buckets).isNotEmpty();
     }
 
-    /* ── Writes: validation-only (empty/fake-id, no real mutation) ──────── */
-
     @Test(groups = {"api", "claims", "claim"})
     @Severity(SeverityLevel.MINOR)
     @Description("POST /Claim/HandleStatus/{claimId} for a non-existent claim returns a 'Claim not found' envelope failure, not a 500.")
@@ -348,7 +338,7 @@ public class ClaimApiTest extends BaseApiTest {
         ApiAssertions.assertJsonBoolean(res, "isSuccess", false, "envelope isSuccess");
     }
 
-    /* ── Writes: real mutations against real claims — disabled stubs ────── */
+    // Real mutations against real claims — disabled stubs.
 
     @Test(enabled = false, groups = {"api", "claims", "claim", "mutating", "destructive"})
     @Severity(SeverityLevel.BLOCKER)

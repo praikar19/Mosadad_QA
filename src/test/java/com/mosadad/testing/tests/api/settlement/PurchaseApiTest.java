@@ -8,15 +8,7 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * settlement service — Purchase tag. The UAE PASS-backed wallet checkout
- * flow behind the real Settlement Rail (see MOSADAD_DOMAIN.md §Wallet,
- * Settlement Rail & UAE PASS) — "Purchase" here means checking out/settling
- * a batch of claims through the Mosadad Wallet, not buying goods. All of it
- * is real-money-adjacent, so only request validation is exercised live.
- */
+/** settlement service — Purchase (wallet checkout). Real-money-adjacent, so only validation runs live. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Settlement API — Purchase")
 public class PurchaseApiTest extends BaseApiTest {

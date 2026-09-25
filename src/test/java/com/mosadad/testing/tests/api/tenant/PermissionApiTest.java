@@ -8,11 +8,6 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
-/**
- * tenant service — Permission tag. A single write-only endpoint (no GET/List
- * exists for bare Permission — browsing happens via
- * {@code PermissionCategory/List}, which nests permissions per group).
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Permission")
 public class PermissionApiTest extends BaseApiTest {

@@ -11,14 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * settlement service — Settlement tag. The Digital Settlement Flow's
- * per-counterpart-insurer summary (see MOSADAD_DOMAIN.md §Wallet, Settlement
- * Rail & UAE PASS). Despite the name, {@code POST /Settlement/{otherEntityId}}
- * is a real/list endpoint (confirmed live: "Settlement Details Retrieved
- * Successfully"), not a create — matching the {@code Settlement/Companies}
- * search pattern.
- */
+/** settlement service — Settlement. POST /Settlement/{otherEntityId} is a read, not a create. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Settlement API — Settlement")
 public class SettlementApiTest extends BaseApiTest {

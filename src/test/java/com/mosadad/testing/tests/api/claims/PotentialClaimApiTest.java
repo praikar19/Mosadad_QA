@@ -11,13 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — PotentialClaim tag. Accident records surfaced from
- * inthub as candidates before a Claimant Insurer turns them into a real
- * Recovery Claim (see MOSADAD_DOMAIN.md §Stage 1 — the "Potential Recovery
- * Claims" list on the dashboard). "Start"/"RestartClaim" promote a
- * potential claim into a real one.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — PotentialClaim")
 public class PotentialClaimApiTest extends BaseApiTest {

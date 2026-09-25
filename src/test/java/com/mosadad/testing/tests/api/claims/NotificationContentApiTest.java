@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — NotificationContent tag. Templated notification message bodies keyed by actionId/eventType (e.g. "`ActionType` has been `ActionState` on the claim number {ClaimNumber}.") — feeds the templates tenant/Notification renders. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — NotificationContent")
 public class NotificationContentApiTest extends BaseApiTest {

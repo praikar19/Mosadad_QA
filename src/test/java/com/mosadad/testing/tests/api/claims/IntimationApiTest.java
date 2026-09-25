@@ -11,25 +11,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * claims service — Intimation tag. Generates/deletes the formal intimation
- * letters referenced across the claim lifecycle (Approval Letter on
- * quotation acceptance, Recovery Letter on invoice — see
- * MOSADAD_DOMAIN.md §Stage 2/3). All 4 operations are PUT and id-scoped (no
- * unscoped-bulk variant, unlike Quotation/Invoice/ExtraExpenses Accept).
- *
- * <p><b>Bug finding, confirmed live 2026-09-17:</b> for a non-existent
- * claimId with an empty body, {@code HandleQuotationIntimationLetter} and
- * {@code HandleDeleteIntimationLetter} fail gracefully (HTTP 200 envelope,
- * isSuccess:false), but {@code HandleInvoiceIntimationLetter} and
- * {@code HandleLouIntimationLetter} throw an unhandled
- * {@code NullReferenceException} in {@code CollectDataRepository
- * .CreateIntimationLetterRequest} — a raw HTTP 500 with the full .NET stack
- * trace (and internal server IPs/hostnames) returned directly in the
- * response body, because ASP.NET Core's Developer Exception Page is enabled
- * on this QA deployment. Worth reporting to the backend team both as an
- * unhandled-null-reference bug and as an information-disclosure hygiene
- * issue (stack traces + internal network details should not reach API
- * clients, even in QA).
+ * claims service — Intimation letters. Known bug: the Invoice and LOU letter
+ * endpoints return HTTP 500 with a full stack trace for an unknown claimId.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Intimation")

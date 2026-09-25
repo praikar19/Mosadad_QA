@@ -10,24 +10,12 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Verified live (2026-08-30): every route asserted here was actually
- * navigated to and its URL confirmed — none of these are guesses.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Entity Navigation")
 public class RecoveryClaimsNavigationTest extends BaseUiTest {
 
     private RecoveryClaimsHubPage hub;
 
-    // Runs after BaseUiTest.launchBrowser() — TestNG always runs superclass
-    // @BeforeMethod methods before subclass ones, so no explicit ordering needed.
-    //
-    // Uses the cached-session login (see BaseUiTest.loginWithCachedSession)
-    // instead of driving the real login form: this method runs once per
-    // @Test below (8x per suite run), and only navigation is under test
-    // here, not login itself — LoginUiTest already covers that. The real
-    // login now happens at most once for the whole run instead of 8 times.
     @BeforeMethod(alwaysRun = true)
     public void loginAndOpenHubForQAPlatform() {
         DashboardPage dashboard = loginWithCachedSession("qa", "dubai");
@@ -55,7 +43,7 @@ public class RecoveryClaimsNavigationTest extends BaseUiTest {
     @Severity(SeverityLevel.NORMAL)
     @Description("Recovery Claim Records module — Potential Recovery Claims link navigates correctly.")
     public void potentialRecoveryClaimsLinkNavigatesCorrectly() {
-        hub.openPotentialRecoveryClaimsListPage();
+        hub.openPotentialRecoveryClaims();
         assertThat(page.url()).contains(Routes.POTENTIAL_RECOVERY_CLAIMS);
     }
 

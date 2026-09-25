@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** tenant service — PermissionGroup tag. Groups individual Permissions (e.g. "Entities": create/read/delete:entities) — the middle tier of the RBAC hierarchy under PermissionCategory. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — PermissionGroup")
 public class PermissionGroupApiTest extends BaseApiTest {

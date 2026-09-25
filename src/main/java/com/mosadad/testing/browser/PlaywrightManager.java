@@ -5,22 +5,7 @@ import com.microsoft.playwright.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Thread-safe Playwright session holder using ThreadLocal.
- *
- * Why ThreadLocal?
- *   When TestNG runs tests in parallel (parallel="methods" or "classes" in
- *   testng.xml), each thread needs its own Playwright/Browser/BrowserContext/
- *   Page — a static field would let one test's navigation bleed into another's
- *   assertions. This mirrors the pattern used for Appium's DriverManager in
- *   the sibling mobile framework (ShopTestApp-Java-Mobile-Testing), applied to
- *   Playwright's session objects instead of a single WebDriver.
- *
- * Usage lifecycle (managed by BaseUiTest):
- *   1. launch(browserName)  — called in @BeforeMethod
- *   2. getPage()            — used in page objects and tests
- *   3. close()              — stops tracing, tears down context/browser/playwright
- */
+/** ThreadLocal Playwright session per test thread (safe for parallel runs). */
 public final class PlaywrightManager {
 
     private static final Logger log = LogManager.getLogger(PlaywrightManager.class);
@@ -61,18 +46,7 @@ public final class PlaywrightManager {
         return page;
     }
 
-    /**
-     * Discards the current context/page and opens a fresh one on the same
-     * already-launched Browser, seeded with the given Playwright
-     * storageState JSON (cookies + localStorage) instead of starting
-     * blank — see AuthStateCache. Same per-test isolation as launch()
-     * (still a brand-new context, not a reused one), just pre-authenticated
-     * so callers can navigate straight past the login form.
-     *
-     * launch() must have already run on this thread (usually via
-     * BaseUiTest's own @BeforeMethod) — this only swaps the context, it
-     * doesn't launch a new Browser.
-     */
+    /** New context seeded with a storageState; launch() must already have run on this thread. */
     public static Page reopenWithStorageState(String storageState) {
         Browser browser = BROWSER.get();
         if (browser == null) {
@@ -83,7 +57,7 @@ public final class PlaywrightManager {
 
         BrowserContext oldContext = CONTEXT.get();
         if (oldContext != null) {
-            oldContext.close(); // blank context, nothing happened on it worth a trace
+            oldContext.close();
         }
 
         Page page = newContextAndPage(browser, storageState);
@@ -91,7 +65,6 @@ public final class PlaywrightManager {
         return page;
     }
 
-    /** Shared by launch() and reopenWithStorageState(): one new context + page on the given browser, with the usual timeouts/tracing, optionally seeded from a storageState JSON string. Updates CONTEXT/PAGE. */
     private static Page newContextAndPage(Browser browser, String storageState) {
         Browser.NewContextOptions options = new Browser.NewContextOptions();
         if (storageState != null) {
@@ -125,7 +98,6 @@ public final class PlaywrightManager {
         return PAGE.get() != null;
     }
 
-    /** Stops tracing (saving to targetPath) and closes context/browser/playwright, then clears the ThreadLocals. */
     public static void close(String tracePath) {
         try {
             BrowserContext context = CONTEXT.get();

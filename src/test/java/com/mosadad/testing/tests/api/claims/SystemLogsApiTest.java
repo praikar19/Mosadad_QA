@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — SystemLogs tag. The real audit trail behind the dashboard's "Recent Activities" widget — every claim/quotation/invoice action logged with actionBy, collection, and timestamp. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — SystemLogs")
 public class SystemLogsApiTest extends BaseApiTest {

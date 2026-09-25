@@ -12,7 +12,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** tenant service — Role tag. Roles bundle permission categories/groups (see PermissionCategoryApiTest) and drive per-user access — see also user thresholds (recovery-amount approval limits). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Role")
 public class RoleApiTest extends BaseApiTest {

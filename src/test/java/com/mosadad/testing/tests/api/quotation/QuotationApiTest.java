@@ -11,23 +11,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * quotation service — Quotation tag. Stage 2 of the claim lifecycle (see
- * MOSADAD_DOMAIN.md §Stage 2: Normal Repair 72h SLA / Total Loss 168h SLA).
- *
- * <p>The envelope here carries extra fields beyond the standard
- * {statusCode, message, response, isSuccess, errors} shape:
- * {@code thresholdFailed, amount, permissionName, shopType} — tying into
- * the tenant service's recovery-amount approval thresholds (see
- * {@code RoleApiTest#getUserThresholdsForLoggedInUserReturns200} /
- * {@code #checkThresholdsForSuperAdminBypassesCheck}).
- *
- * <p><b>Caution — {@code PUT /Quotation/AcceptAll} is NOT id-scoped.</b>
- * Unlike every other write endpoint in this tag it takes no id and no
- * required body, and confirmed live it performs a real bulk accept when
- * called with an empty body (returned {@code "Accepted Successfully":true}).
- * There is no safe way to probe it without risking a real mutation, so it
- * has no live test at all here — only a permanently-disabled stub with this
- * warning. Do not call it ad hoc against a shared environment.
+ * quotation service — Quotation. WARNING: PUT /Quotation/AcceptAll is not
+ * id-scoped and performs a real bulk accept — never call it on a shared environment.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Quotation API — Quotation")

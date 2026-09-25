@@ -12,13 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * inthub service — Accident tag. Accident records sourced from UAE Police
- * authorities — see MOSADAD_DOMAIN.md §Stage 1 "Police Data Entry": Dubai
- * Police, Rafid, and Saeed are named integrations. {@code /Accident/Rafid}
- * and {@code /Accident/Saeed} call out to those real external government
- * systems for a genuine police report number, so their happy path stays a
- * disabled stub — only their request-validation branch (which short-circuits
- * before any external call, confirmed live) is exercised for real.
+ * inthub service — Accident. /Accident/Rafid and /Accident/Saeed call real
+ * external police systems, so only their validation branch runs live.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("IntHub API — Accident")

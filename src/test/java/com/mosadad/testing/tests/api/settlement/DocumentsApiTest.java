@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** settlement service — Documents tag. Same token-signed content-serving contract as quotation's Documents tag (credit note copies — see MOSADAD_DOMAIN.md §Stage 4), confirmed live independently since each microservice has its own implementation. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Settlement API — Documents")
 public class DocumentsApiTest extends BaseApiTest {

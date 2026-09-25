@@ -11,17 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — InAppNotification tag. The bell-icon notification inbox
- * (see FRAMEWORK.md's captured network traffic: {@code InAppNotification/Search}
- * is the real call the dashboard's bell button makes).
- *
- * <p>Note {@code PUT /InAppNotification/MarkAsRead} is body-only (no id) —
- * structurally similar to the risky AcceptAll family, but confirmed live to
- * be a genuinely benign, self-scoped action (marks the logged-in user's own
- * notifications read, the same as clicking "mark all read" in the UI) — so
- * unlike AcceptAll/Config-Update it IS exercised live here.
- */
+/** claims service — InAppNotification. MarkAsRead is self-scoped, so it is safe to run. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — InAppNotification")
 public class InAppNotificationApiTest extends BaseApiTest {

@@ -11,19 +11,8 @@ import org.testng.annotations.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * REAL, verified live 2026-09-17 — {@code POST /tenant/User/Login}.
- *
- * The Angular app never sends plaintext credentials: email and password are
- * XOR-obfuscated client-side first (reverse-engineered from the live QA
- * bundle, see {@code EncryptionUtil} javadoc). These tests replicate that
- * exact scheme so the suite can drive real auth without a browser — this is
- * now the fast, no-browser-required PR gate the framework was designed for
- * (see FRAMEWORK.md "API tests — currently a no-op stub").
- *
- * Business-logic login failures (wrong password) come back as HTTP 200
- * with the real outcome in the JSON envelope, not HTTP 401/403 — see
- * {@link ApiAssertions} javadoc. Only a missing/invalid bearer token on a
- * protected endpoint produces a real HTTP 401.
+ * POST /tenant/User/Login with the front end's field obfuscation (EncryptionUtil).
+ * Wrong credentials return HTTP 200 with the failure in the envelope, not 401.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Authentication API")
@@ -89,7 +78,6 @@ public class AuthApiTest extends BaseApiTest {
     public void refreshTokenWithValidRefreshTokenReturnsNewAccessToken() {
         apiClient.login(ConfigManager.getEmail("qa", "dubai"), ConfigManager.getPassword("qa", "dubai"));
         Response res = apiClient.refreshToken();
-        // Some backends 200/envelope this, others plain-401 an unsupported/empty refresh token — assert loosely on transport, tightly on body only when the call actually succeeded.
         if (res.statusCode() == 200 && Boolean.TRUE.equals(res.jsonPath().getBoolean("isSuccess"))) {
             assertThat(res.jsonPath().getString("response.token.accessToken")).isNotBlank();
         } else {

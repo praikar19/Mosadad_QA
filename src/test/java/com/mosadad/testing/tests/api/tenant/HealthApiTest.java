@@ -9,11 +9,7 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * tenant service — Health tag. A public, unauthenticated liveness probe —
- * confirmed live 2026-09-17 that it returns 200 with no bearer token at all
- * (unlike every other endpoint in this framework, which requires one).
- */
+/** tenant service — Health. Public: returns 200 without a token. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Health")
 public class HealthApiTest extends BaseApiTest {

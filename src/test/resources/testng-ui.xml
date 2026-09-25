@@ -18,6 +18,8 @@
         <parameter name="browser" value="chromium"/>
         <classes>
             <class name="com.mosadad.testing.tests.auth.LoginUiTest"/>
+            <class name="com.mosadad.testing.tests.auth.ForgotPasswordUiTest"/>
+            <class name="com.mosadad.testing.tests.auth.LoginLanguageUiTest"/>
         </classes>
     </test>
 
@@ -25,13 +27,6 @@
         <parameter name="browser" value="chromium"/>
         <classes>
             <class name="com.mosadad.testing.tests.navigation.RecoveryClaimsNavigationTest"/>
-        </classes>
-    </test>
-
-    <test name="Create Manual Recovery Claim — Upload Gate">
-        <parameter name="browser" value="chromium"/>
-        <classes>
-            <class name="com.mosadad.testing.tests.claims.CreateManualRecoveryClaimTest"/>
         </classes>
     </test>
 

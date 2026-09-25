@@ -15,15 +15,7 @@ import org.testng.annotations.Parameters;
 
 import java.time.format.DateTimeFormatter;
 
-/**
- * Base for UI tests. Launches a fresh Playwright browser/context/page per
- * test method (deliberate — reusing a context across methods leaks cookies
- * and navigation state between tests) and tears it down afterwards, saving
- * a Playwright trace for debugging failures.
- *
- * Browser is chosen via the "browser" TestNG parameter (see testng*.xml),
- * falling back to config.properties' `browser` key (default: chromium).
- */
+/** Base for UI tests: fresh browser context per test method, with a trace saved on teardown. */
 public abstract class BaseUiTest extends BaseTest {
 
     protected Page page;
@@ -48,20 +40,7 @@ public abstract class BaseUiTest extends BaseTest {
         page.navigate(ConfigManager.getLoginUrl());
     }
 
-    /**
-     * For tests that need to *be* logged in but aren't testing the login
-     * form itself: skips driving LoginPage's real form and instead reopens
-     * this test's context with a cached, already-authenticated storage
-     * state (see AuthStateCache) — a real login still happens, just once
-     * per platform/userKey for the whole suite run, not once per @Test
-     * method. Still a fresh, isolated context per test method, same as
-     * launchBrowser() gives every test — just pre-seeded instead of blank.
-     *
-     * Call from a subclass @BeforeMethod in place of
-     * navigateToLogin()/loginPage.login(...). Don't use this in a test
-     * that exercises the real login form — see LoginUiTest, which keeps
-     * using navigateToLogin() + loginPage.login(...) directly.
-     */
+    /** Opens a context with a cached logged-in session. Don't use it in tests of the login form itself. */
     @Step("Log in with cached session (platform={0}, user={1})")
     protected DashboardPage loginWithCachedSession(String platform, String userKey) {
         String storageState = AuthStateCache.ensureLoggedIn(platform, userKey);

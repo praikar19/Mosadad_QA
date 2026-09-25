@@ -8,12 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Verified live against the QA environment (2026-08-30) as the Claimant
- * Insurer role. This is the reference example for the rest of the
- * framework — every locator and assertion here was confirmed against the
- * real app, not guessed.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Authentication")
 public class LoginUiTest extends BaseUiTest {

@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — Events tag. Notification event-type catalog feeding tenant service's Notification templates (see tenant {@code NotificationApiTest#listEventsForClaimsCategoryReturns200}). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Events")
 public class EventsApiTest extends BaseApiTest {

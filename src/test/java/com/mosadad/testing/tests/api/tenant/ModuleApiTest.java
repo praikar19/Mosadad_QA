@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** tenant service — Module tag. The platform's top-level modules (Recovery Claims, Company Details, FNOL, ...) that drive the entity portal's sidebar. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Tenant API — Module")
 public class ModuleApiTest extends BaseApiTest {

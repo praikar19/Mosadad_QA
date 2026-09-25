@@ -12,23 +12,12 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — FastTrack tag. Bulk Excel-upload claim recovery for
- * high-volume, simple claims against the same counterpart insurer (see
- * MOSADAD_DOMAIN.md §Fast Track — Why It Exists). The largest tag by
- * endpoint count after Dashboard (43 operations): batch lifecycle
- * (create/save/submit/close), per-item corrections, document upload
- * (including chunked large-file upload), SAI (Smart AI?) document
- * ingestion, and exports.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — FastTrack")
 public class FastTrackApiTest extends BaseApiTest {
 
     private static final String FAKE_ID = "000000000000000000000000";
-    private static final String REAL_BATCH_ID = "69bcf0fce3435748c25a7173"; // real batch, different (Qatar) company — used for batch-scoped reads only
-
-    /* ── Reads ─────────────────────────────────────────────────────────── */
+    private static final String REAL_BATCH_ID = "69bcf0fce3435748c25a7173";  // Belongs to another company — read-only use
 
     @Test(groups = {"api", "claims", "fast-track"})
     @Severity(SeverityLevel.CRITICAL)
@@ -176,8 +165,6 @@ public class FastTrackApiTest extends BaseApiTest {
         ApiAssertions.assertStatusCode(res, 200, "HTTP status");
         assertThat(res.asByteArray().length).isGreaterThan(0);
     }
-
-    /* ── Writes: validation-only / fake-scoped (no real mutation) ────────── */
 
     @Test(groups = {"api", "claims", "fast-track"})
     @Severity(SeverityLevel.NORMAL)
@@ -386,7 +373,7 @@ public class FastTrackApiTest extends BaseApiTest {
         assertThat(res.asByteArray().length).isGreaterThan(0);
     }
 
-    /* ── Writes: real mutations against real batches — disabled stubs ───── */
+    // Real mutations against real batches — disabled stubs.
 
     @Test(enabled = false, groups = {"api", "claims", "fast-track", "mutating"})
     @Severity(SeverityLevel.CRITICAL)

@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** quotation service — Submittal tag. Workshop-estimate / repair-amount submissions attached to a claim's quotation (see MOSADAD_DOMAIN.md §Stage 2A step 1). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Quotation API — Submittal")
 public class SubmittalApiTest extends BaseApiTest {

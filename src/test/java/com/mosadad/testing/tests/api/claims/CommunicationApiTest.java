@@ -11,18 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * claims service — Communication tag. Per-claim audit-logged comment thread
- * ("Messages here are specific to this claim and are retained for audit and
- * regulatory review" — real system welcome message, confirmed live) — this
- * is the structured-communication mechanism MOSADAD_DOMAIN.md §Disputes
- * describes replacing informal email back-and-forth.
- *
- * <p>Note the real route carries an extra {@code /api} segment
- * ({@code /api/Communication}, not {@code /Communication}) — confirmed live
- * against the Swagger-documented path, unlike claims/Action (see
- * {@code ActionApiTest}), which 404s regardless of the extra segment.
- */
+/** claims service — Communication. The real route has an extra /api segment. */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Communication")
 public class CommunicationApiTest extends BaseApiTest {

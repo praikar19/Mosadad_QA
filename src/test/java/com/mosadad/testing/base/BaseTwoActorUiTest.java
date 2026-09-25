@@ -10,20 +10,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Base for any test needing two concurrently-logged-in browser sessions —
- * a claimant insurer and an at-fault insurer, each in their own browser
- * engine (see TwoActorPlaywrightManager's Javadoc for why two engines, not
- * two contexts on one engine). Mirrors BaseUiTest's single-session
- * lifecycle: launch both sessions in @BeforeMethod, tear both down (with a
- * trace per actor) in @AfterMethod.
- *
- * Extends BaseTest directly, not BaseUiTest — BaseUiTest's own
- * @BeforeMethod would launch a third, unused single-actor session on top of
- * these two.
- *
- * Default engines are chrome (claimant) / safari (at-fault); override
- * claimantBrowser()/atFaultBrowser() for a different pairing (e.g. two
- * Chrome sessions).
+ * Base for tests needing a claimant and an at-fault session at once. Extends
+ * BaseTest, not BaseUiTest, to avoid launching a third unused session.
  */
 public abstract class BaseTwoActorUiTest extends BaseTest {
 

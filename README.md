@@ -113,6 +113,12 @@ Use this rule:
 
 This project uses Allure.
 
+Every run (`mvn test`, any profile) writes an emailable single-file report to
+`reports/Allure_<suite>_<timestamp>.html`. Screenshots are embedded, so it
+opens straight from an email attachment. It covers that run only, because
+`target/allure-results` is cleared at the start of each run. Skip it with
+`-Dallure.report.skip=true`. See `AllureReportListener`.
+
 To open the report locally:
 
 ```bash

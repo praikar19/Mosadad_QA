@@ -16,24 +16,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Apache POI-backed reader for .xlsx/.xls test data, e.g.
- * src/main/resources/Fast Track333.xlsx — the Fast Track bulk-claim-upload
- * template referenced in MOSADAD_DOMAIN.md §Fast Track (claim number,
- * accident details, policy, invoice, recovery claim amount per row).
- *
- * Reads a classpath resource, not a filesystem path, so it works the same
- * whether the sheet lives under src/main/resources or src/test/resources —
- * both end up on the test classpath. WorkbookFactory auto-detects .xls vs
- * .xlsx from the stream, so callers don't need to pick XSSF/HSSF themselves.
- */
+/** Reads .xlsx/.xls test data from the classpath. */
 public final class ExcelUtils {
 
     private static final Logger log = LogManager.getLogger(ExcelUtils.class);
 
     private ExcelUtils() {}
 
-    /** Reads the first sheet, keyed by header row (row 0). Fully blank rows are skipped. */
+    /** First sheet, keyed by the header row; blank rows are skipped. */
     public static List<Map<String, String>> readRowsAsMaps(String resourceName) {
         return readRowsAsMaps(resourceName, 0);
     }
@@ -93,16 +83,6 @@ public final class ExcelUtils {
         return rows;
     }
 
-    /**
-     * TestNG @DataProvider-friendly form — each element is a single-arg
-     * Object[] wrapping the row's header->value map, e.g.:
-     * <pre>{@code
-     * @DataProvider(name = "fastTrackClaims")
-     * public Object[][] fastTrackClaims() {
-     *     return ExcelUtils.readRowsAsDataProvider("Fast Track333.xlsx");
-     * }
-     * }</pre>
-     */
     public static Object[][] readRowsAsDataProvider(String resourceName) {
         List<Map<String, String>> rows = readRowsAsMaps(resourceName);
         Object[][] data = new Object[rows.size()][1];

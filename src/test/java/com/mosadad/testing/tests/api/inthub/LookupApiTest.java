@@ -12,16 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * inthub service — Lookup tag. Generic reference-data endpoint. Note there
- * are two distinct lookup surfaces confirmed live: {@code Lookup/Resource}
- * (used by the real Angular dashboard to resolve entity names — see
- * FRAMEWORK.md's captured network traffic) works for {@code name=Entity};
- * the plain {@code Lookup}/{@code Lookup/Paged}/{@code Lookup/{id}/Children}
- * family returns "No lookups found" for every category tried on this QA
- * tenant (Entity, Emirate, AccidentType, EmirateCode, VehicleColor,
- * PlateSource/Color, Nationality, Country) — this QA environment's generic
- * Lookup collection appears to be unseeded, so these assert the graceful
- * envelope failure shape rather than real data.
+ * inthub service — Lookup. The generic Lookup collection is unseeded on this
+ * environment, so most tests assert the graceful failure shape.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("IntHub API — Lookup")

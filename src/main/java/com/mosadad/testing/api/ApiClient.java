@@ -13,32 +13,12 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
-/**
- * RestAssured-backed HTTP client for Mosadad's real backend — six
- * microservices sitting behind one shared Azure API Management gateway.
- *
- * <p><b>Base URL — CONFIRMED LIVE 2026-09-17.</b> Captured directly from
- * the Angular app's own network traffic (not the Swagger UI hosts, which
- * are a separate direct-to-origin path used only for API discovery):
- * {@code https://recovery-api-management-qa.azure-api.net/api/<service>},
- * where {@code <service>} is one of claims / inthub / invoice / quotation /
- * settlement / tenant — see {@link Service}.
- *
- * <p><b>Auth — CONFIRMED LIVE.</b> {@code POST /tenant/User/Login} with an
- * XOR-obfuscated email/password (see {@link EncryptionUtil}) returns a JWT
- * Bearer token good for every other endpoint; a request with no token (or a
- * stale one) gets a real {@code 401}, confirmed against the live gateway
- * with no token at all (no Ocp-Apim-Subscription-Key or similar gateway
- * key required). The token is cached statically (JVM-wide, one real login
- * call for the whole suite) since every API test class otherwise pays for
- * its own {@code @BeforeClass} — see {@code BaseApiTest}.
- */
+/** RestAssured client for the backend services; logs in once per JVM and reuses the token. */
 public class ApiClient {
 
     private static final Logger log = LogManager.getLogger(ApiClient.class);
     private static final String GATEWAY = ConfigManager.getApiGatewayUrl();
 
-    /** One backend microservice behind the shared APIM gateway — the path segment matches its Swagger UI. */
     public enum Service {
         CLAIMS("claims"),
         INTHUB("inthub"),
@@ -53,7 +33,6 @@ public class ApiClient {
         public String baseUri() { return GATEWAY + "/" + segment; }
     }
 
-    /* ── Shared (JVM-wide) authenticated session — one real login for the whole suite ── */
     private static volatile String cachedAccessToken;
     private static volatile String cachedRefreshToken;
     private static volatile String cachedEntityId;
@@ -65,15 +44,7 @@ public class ApiClient {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
 
-    /* ── Auth ─────────────────────────────────────────────────────────── */
-
-    /**
-     * POST /tenant/User/Login with the given plaintext credentials
-     * (encrypted client-side exactly like the real Angular app does — see
-     * {@link EncryptionUtil}). Does NOT throw on non-2xx; callers assert on
-     * the returned {@link Response} (e.g. a 401-on-bad-credentials test).
-     * On success, caches the token/entityId/user for {@link #ensureAuthenticated()}.
-     */
+    /** Does not throw on non-2xx; on success caches the session. */
     public Response login(String email, String password) {
         Map<String, String> body = new LinkedHashMap<>();
         body.put("email", EncryptionUtil.encryptLoginField(email));
@@ -100,7 +71,6 @@ public class ApiClient {
         return res;
     }
 
-    /** POST /tenant/User/RefreshToken using the cached refresh token from the last successful login. */
     public Response refreshToken() {
         ensureAuthenticated();
         Map<String, String> body = Map.of("refreshToken", cachedRefreshToken == null ? "" : cachedRefreshToken);
@@ -112,7 +82,6 @@ public class ApiClient {
                 .post("/User/RefreshToken");
     }
 
-    /** Logs in once per JVM using the default QA Claimant Insurer account (credentials.properties: qa.claimant.*.dubai). Cheap no-op on subsequent calls. */
     public void ensureAuthenticated() {
         if (cachedAccessToken == null) {
             synchronized (LOGIN_LOCK) {
@@ -128,25 +97,11 @@ public class ApiClient {
         }
     }
 
-    /** Drops the cached session so the next {@link #ensureAuthenticated()} performs a fresh real login. */
-    public void clearSession() {
-        synchronized (LOGIN_LOCK) {
-            cachedAccessToken = null;
-            cachedRefreshToken = null;
-            cachedEntityId = null;
-            cachedUserId = null;
-            cachedUserType = null;
-        }
-    }
-
     public String accessToken()  { ensureAuthenticated(); return cachedAccessToken; }
     public String entityId()     { ensureAuthenticated(); return cachedEntityId; }
     public String currentUserId(){ ensureAuthenticated(); return cachedUserId; }
     public String currentUserType() { ensureAuthenticated(); return cachedUserType; }
 
-    /* ── Request builders ────────────────────────────────────────────── */
-
-    /** Authenticated request spec for the given service — auto-bootstraps the shared session on first use. */
     public RequestSpecification spec(Service service) {
         ensureAuthenticated();
         return given()
@@ -156,7 +111,6 @@ public class ApiClient {
                 .header("Authorization", "Bearer " + cachedAccessToken);
     }
 
-    /** Same as {@link #spec(Service)} but with an explicit token — for expired/malformed/foreign-token negative tests. */
     public RequestSpecification specWithToken(Service service, String token) {
         RequestSpecification rs = given()
                 .baseUri(service.baseUri())
@@ -168,7 +122,7 @@ public class ApiClient {
         return rs;
     }
 
-    /** No Authorization header at all — for "must return 401 without a token" tests. */
+    /** No Authorization header — for 401 tests. */
     public RequestSpecification unauthenticatedSpec(Service service) {
         return given()
                 .baseUri(service.baseUri())
@@ -176,12 +130,4 @@ public class ApiClient {
                 .accept(ContentType.JSON);
     }
 
-    /** Authenticated multipart spec (file uploads: Attachment, Documents, FastTrack). */
-    public RequestSpecification multipartSpec(Service service) {
-        ensureAuthenticated();
-        return given()
-                .baseUri(service.baseUri())
-                .accept(ContentType.JSON)
-                .header("Authorization", "Bearer " + cachedAccessToken);
-    }
 }

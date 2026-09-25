@@ -9,11 +9,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Verified against the real file: src/main/resources/Fast Track333.xlsx
- * (the Fast Track bulk-upload template — see MOSADAD_DOMAIN.md §Fast Track).
- * No browser/live app involved — pure data-reading, safe to run anywhere.
- */
 @Epic("Mosadad Recovery Claim")
 @Feature("Test Data — Excel")
 public class ExcelUtilsTest {
@@ -25,9 +20,7 @@ public class ExcelUtilsTest {
     public void readsFastTrackDataRowsKeyedByHeader() {
         List<Map<String, String>> rows = ExcelUtils.readRowsAsMaps(FAST_TRACK_FILE);
 
-        // The template has header row 1 + 3 populated claims + several
-        // intentionally-blank rows for future manual entry — only the 3
-        // populated rows should come back.
+        // Only the 3 populated rows should come back; the rest are blank.
         assertThat(rows).hasSize(3);
 
         Map<String, String> firstClaim = rows.get(0);

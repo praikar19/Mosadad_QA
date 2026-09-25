@@ -226,6 +226,13 @@
             </properties>
         </profile>
         <profile>
+            <id>fast-track</id>
+            <activation><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <suiteXmlFile>src/test/resources/testng-fast-track.xml</suiteXmlFile>
+            </properties>
+        </profile>
+        <profile>
             <id>regression</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>

@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** claims service — EntitySmartLoader tag. Per-entity field-mapping config for bulk/smart data import (maps internal fields like "claim_number" to an insurer's own external column names — e.g. "Claim No.", "Accident Number") — supports Fast Track's Excel import (see MOSADAD_DOMAIN.md §Fast Track). */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — EntitySmartLoader")
 public class EntitySmartLoaderApiTest extends BaseApiTest {

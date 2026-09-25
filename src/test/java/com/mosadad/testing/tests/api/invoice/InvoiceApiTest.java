@@ -8,20 +8,9 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * invoice service — Invoice tag. Stage 3 of the claim lifecycle (see
- * MOSADAD_DOMAIN.md §Stage 3: final repair invoice, credit note, recovery
- * letter, At-Fault approve/negotiate).
- *
- * <p><b>Caution — {@code PUT /Invoice/Accept} (no id) is the same
- * dangerous unscoped-bulk pattern</b> documented in
- * {@code QuotationApiTest#acceptAllQuotationsIsBulkAndUnscoped_NeverRunWithoutSignOff}
- * and {@code ExtraExpensesApiTest} — confirmed live an empty body returns
- * {@code "Accepted Successfully":true}. Its id-scoped sibling
- * {@code PUT /Invoice/{id}/Accept} is safe and used below instead; the
- * unscoped variant is never called by this suite.
+ * invoice service — Invoice. WARNING: PUT /Invoice/Accept (no id) performs a
+ * real bulk accept — never call it; use the id-scoped variant.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Invoice API — Invoice")

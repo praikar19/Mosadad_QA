@@ -12,22 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * settlement service — CreditNote tag. Stage 4 of the claim lifecycle (see
- * MOSADAD_DOMAIN.md §Stage 4: at-fault insurer issues a credit note,
- * settlement is recorded, claim closes). "Bulk" here means aggregated
- * across many claims against one counterpart insurer (Fast Track's
- * counterpart — see MOSADAD_DOMAIN.md §Fast Track), not a bulk-write.
- *
- * <p><b>Caution — {@code GET /CreditNote/Notify/{otherEntityId}/{claimId}}
- * is a real side-effecting action despite the GET verb.</b> Confirmed live
- * it queues/sends a real notification and returns
- * {@code "notification sent successfully":true} even for two well-formed
- * but non-existent ids — it does not validate that either id refers to a
- * real record before "succeeding". There is no read-only way to probe it;
- * the test below deliberately uses fake ids to keep the call deterministic
- * and avoid notifying a real counterpart insurer, but every run of it still
- * performs a real action. Consider excluding the {@code "notifies"} group
- * from routine CI runs if that's undesirable.
+ * settlement service — CreditNote. WARNING: GET /CreditNote/Notify sends a
+ * real notification despite being a GET (the "notifies" group).
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Settlement API — CreditNote")

@@ -9,22 +9,8 @@ import org.testng.annotations.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * claims service — Config tag. Per-entity SLA/config settings — the
- * platform-configurable backing for MOSADAD_DOMAIN.md's SLA windows (72h
- * Normal Repair / 168h Total Loss) and Fast Track approval thresholds.
- *
- * <p><b>Caution — {@code POST /Config/Update} is another unscoped-body-only
- * write</b> in the same family as {@code QuotationApiTest}'s
- * {@code AcceptAll}: confirmed live an empty body returns 200
- * {@code "Config updated successfully."} rather than a validation error or
- * a no-op. It is never called by this suite, not even with an empty body —
- * only a permanently-disabled stub documents it.
- *
- * <p>Also confirmed live: the logged-in Super Admin QA account does NOT
- * hold the {@code read:fast-track-threshold} permission — every
- * FastTrackApprovalThreshold read returns a real HTTP 403 with that exact
- * permission name in its errors array, a genuine "authenticated but
- * forbidden" case distinct from the 401s elsewhere in this suite.
+ * claims service — Config. WARNING: POST /Config/Update accepts an empty body
+ * and really updates config — never call it.
  */
 @Epic("Mosadad Recovery Claim")
 @Feature("Claims API — Config")
